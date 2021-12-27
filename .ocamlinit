@@ -1,2 +1,2 @@
-#use "parser.ml";;
-#use "lexer.ml";;
+#load "parser.cmo";;
+#load "lexer.cmo";;

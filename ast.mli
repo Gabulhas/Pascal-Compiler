@@ -4,9 +4,10 @@
 
 type ident = Ident of string
 
-and program = Program of ident * block
+(*PROCEDURE (ident: name) (variable_declaration list: arguments) ....*)
+and program = Program of string *  block
 
-and block = Block of variable_declaration list * procedure_declaration list * statement list
+and block = Block of variable_declaration list * subprogam_declaration list * statement
 
 (*-------------------Variable declaration part----------------------------------------------*)
 
@@ -29,7 +30,11 @@ and simpletype  =  | TypeInteger
 (*-------------------Procedure declaration part---------------------------------------------*)
 
 (* <procedure declaration> ::=	procedure <identifier> ; <block> *)
-and procedure_declaration = ProcedureDeclartion of ident * block
+and subprogam_declaration =
+    | ProcedureDeclartion of ident * variable_declaration list * block 
+    (* Last value is the return type*)
+    | FunctionDeclaration of ident * variable_declaration list * block * pascaltype
+(*------------------------------------------------------------------------------------------*)
 
 
 (*-------------------Statement declaration part---------------------------------------------*)
@@ -38,16 +43,15 @@ and procedure_declaration = ProcedureDeclartion of ident * block
 and statement = | STMTAss of variable * exp
                 (*Begin...End*)
                 | STMTBlock of statement list
-                | STMTFor of exp * exp * exp * statement
+                | STMTFor of ident * arithexp * arithexp * statement
                 (*<if statement> ::=	if <expression> then <statement> | if <expression> then <statement> else <statement>  option because it might have an else statement or not *)
                 | STMTIf of booleanexp * statement * statement option
                 (*example batata(4, a, 9*2) *)
-                | STMTProcedureCall of ident * exp list 
-                | STMTRead of variable list
-                | STMTReadln of variable list
+                | STMTSubprogramCall of ident * exp list 
                 | STMTWhile of booleanexp * statement
+
+                | STMTRead of variable
                 | STMTWrite of exp list
-                | STMTWriteln of exp list
 
 and exp = 
     | ArithExp of arithexp 
@@ -58,7 +62,7 @@ and exp =
 and arithexp =
     | Integer of int
 	| Real of float
-	| VAR of ident
+    | NumVar of ident
     | SUM of arithexp * arithexp
     | SUB of arithexp * arithexp
     | MUL of arithexp * arithexp
@@ -66,6 +70,7 @@ and arithexp =
 
 and booleanexp =
     | B of bool
+    | BoolVar of ident
     | Equ of arithexp * arithexp
     | LE of  arithexp * arithexp
     | LT of  arithexp * arithexp
@@ -78,7 +83,8 @@ and booleanexp =
 and miscexp =
     | PString of string
     | PChar of string
+	| VAR of ident
 
 (*EntireVar -> batata(a) *)
 (*IndexedVar -> batata(a[1]) *)
-and variable = EnitreVar of ident | IndexedVar of ident * arithexp
+and variable = EntireVar of ident | IndexedVar of ident * arithexp

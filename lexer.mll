@@ -4,13 +4,20 @@ open Parser;;
 
 exception UnknownChar;;
 
+let remove_quotes my_str =
+    String.sub my_str 1 ((String.length my_str) -2)
+
 }
 
 (* REGULAR DEFINITIONS *)
 
 let integer = '-'? ['0'-'9']+
 let float   = '-'? ['0'-'9']* '.' ['0'-'9']+
-let ident   = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
+let string = '"' [^'"']* '"'
+let digit = ['0'-'9']
+let letter = ['a'-'z' 'A'-'Z']
+let ident = letter (letter | digit | '_')*
+
 
 let space = [' ' '\t']
 let comment = "#" [^'\n']*
@@ -19,21 +26,22 @@ let comment = "#" [^'\n']*
 (* RULES *)
 
 rule lex =
-  parse integer         { NUM (int_of_string (Lexing.lexeme lexbuf))    }
+  parse integer         { INT (int_of_string (Lexing.lexeme lexbuf))    }
       | float           { REAL (float_of_string (Lexing.lexeme lexbuf)) }
+      | string          { PSTRING (remove_quotes (Lexing.lexeme lexbuf)) }
 
       | "true"          { TRUE }
       | "false"         { FALSE }
-
-      | "."             { DOT }
-      | "record"        { RECORD }
 
       | "program"       { PROGRAM }
       | "var"           { VAR }
       | "array"         { ARRAY }
       | "of"            { OF }
-      | "int"           { INT }
-      | "float"         { FLOAT }
+      | "int"           { TINT }
+      | "real"          { TREAL }
+      | "bool"          { TBOOLEAN }
+      | "char"          { TCHAR }
+      | "str"           { TSTRING }
       | "procedure"     { PROCEDURE }
       | "function"      { FUNCTION }
       | "begin"         { BEGIN }
@@ -42,10 +50,10 @@ rule lex =
       | "then"          { THEN }
       | "else"          { ELSE }
       | "while"         { WHILE }
-      | "do"            { DO }
       | "for"           { FOR }
       | "to"            { TO }
       | "write"         { WRITE }
+      | "read"         { READ }
       (*| "call"          { CALL }*)
 
       | ident           { IDE (Lexing.lexeme lexbuf) }
@@ -54,10 +62,10 @@ rule lex =
       | "-"             { MINUS }
       | "*"             { TIMES }
       | "/"             { DIVISION }
+
       | "="             { EQUAL }
       | "<="            { LESSEQUAL }
       | "<"             { LESS }
-
       | ">="            { GREATEREQUAL } 
       | ">"             { GREATER }
 
@@ -75,6 +83,8 @@ rule lex =
       | "["             { LS }
       | "]"             { RS }
       | "\""            { QUOTE }
+
+      | "."             { DOT }
 
       | [' ' '\t' '\n'] { lex lexbuf }
       | eof             { EOF }

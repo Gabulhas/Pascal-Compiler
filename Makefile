@@ -29,7 +29,7 @@ $(BIN):$(CMO)
 	ocamllex $<
 
 .mly.ml:
-	menhir --infer -v $<
+	menhir --unused-tokens --infer -v $<
 
 .mly.mli:
 	menhir -v $<

@@ -1,0 +1,58 @@
+
+** Conflict (shift/reduce) in state 106.
+** Token involved: ELSE
+** This state is reached from program after reading:
+
+PROGRAM PSTRING opt_variable_declaration_list IF booleanexp THEN IF booleanexp THEN statement
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+PROGRAM PSTRING block DOT EOF 
+                opt_variable_declaration_list statement 
+                                              (?)
+
+** In state 106, looking ahead at ELSE, reducing production
+** opt_else ->
+** is permitted because of the following sub-derivation:
+
+IF booleanexp THEN statement opt_else // lookahead token appears because opt_else can begin with ELSE
+                   IF booleanexp THEN statement opt_else // lookahead token is inherited
+                                                . 
+
+** In state 106, looking ahead at ELSE, shifting is permitted
+** because of the following sub-derivation:
+
+IF booleanexp THEN statement opt_else 
+                   IF booleanexp THEN statement opt_else 
+                                                . ELSE statement 
+
+** Conflict (shift/reduce) in state 57.
+** Tokens involved: OR AND
+** The following explanations concentrate on token OR.
+** This state is reached from program after reading:
+
+PROGRAM PSTRING opt_variable_declaration_list WHILE NOT booleanexp
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+PROGRAM PSTRING block DOT EOF 
+                opt_variable_declaration_list statement 
+                                              WHILE booleanexp DO statement 
+                                                    (?)
+
+** In state 57, looking ahead at OR, reducing production
+** booleanexp -> NOT booleanexp
+** is permitted because of the following sub-derivation:
+
+booleanexp OR booleanexp // lookahead token appears
+NOT booleanexp . 
+
+** In state 57, looking ahead at OR, shifting is permitted
+** because of the following sub-derivation:
+
+NOT booleanexp 
+    booleanexp . OR booleanexp 
