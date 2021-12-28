@@ -12,7 +12,6 @@ let remove_quotes my_str =
 (* REGULAR DEFINITIONS *)
 
 let integer = '-'? ['0'-'9']+
-let float   = '-'? ['0'-'9']* '.' ['0'-'9']+
 let string = '"' [^'"']* '"'
 let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
@@ -27,7 +26,6 @@ let comment = "#" [^'\n']*
 
 rule lex =
   parse integer         { INT (int_of_string (Lexing.lexeme lexbuf))    }
-      | float           { REAL (float_of_string (Lexing.lexeme lexbuf)) }
       | string          { PSTRING (remove_quotes (Lexing.lexeme lexbuf)) }
 
       | "true"          { TRUE }
@@ -38,8 +36,7 @@ rule lex =
       | "array"         { ARRAY }
       | "of"            { OF }
       | "int"           { TINT }
-      | "real"          { TREAL }
-      | "bool"          { TBOOLEAN }
+      | "boolean"       { TBOOLEAN }
       | "char"          { TCHAR }
       | "str"           { TSTRING }
       | "procedure"     { PROCEDURE }
@@ -52,9 +49,10 @@ rule lex =
       | "while"         { WHILE }
       | "for"           { FOR }
       | "to"            { TO }
+      | "do"            { DO}
       | "write"         { WRITE }
       | "read"         { READ }
-      (*| "call"          { CALL }*)
+      (*| "call"           { CALL }*)
 
       | ident           { IDE (Lexing.lexeme lexbuf) }
 

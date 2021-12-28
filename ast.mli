@@ -49,9 +49,9 @@ and statement = | STMTAss of variable * exp
                 (*example batata(4, a, 9*2) *)
                 | STMTSubprogramCall of ident * exp list 
                 | STMTWhile of booleanexp * statement
-
                 | STMTRead of variable
                 | STMTWrite of exp list
+                | STMTEmpty
 
 and exp = 
     | ArithExp of arithexp 
@@ -82,7 +82,7 @@ and booleanexp =
 
 and miscexp =
     | PString of string
-    | PChar of string
+    | PChar of char
 	| VAR of ident
 
 (*EntireVar -> batata(a) *)

@@ -2,6 +2,8 @@
 
 open Ast;;
 
+let vars_to_list var_ides var_type =
+    List.map (fun x -> VariableDeclaration(x, var_type)) var_ides
 %}
 
 %token <string>   IDE
@@ -28,69 +30,86 @@ open Ast;;
 %token            DOT
 %token            EOF
 
+
+
 %left OR
 %left AND
-%left MINUS
-%left PLUS
-%left DIVISION
-%left TIMES
+%nonassoc NOT
+%nonassoc LT LE GT GE EQ NE
+%left MINUS PLUS
+%left TIMES DIVISION
+%nonassoc LS
+%nonassoc THEN
+%nonassoc ELSE
+
 
 
 %start program
 %type <Ast.program> program
 %%
 
+(*
+PROGRAM ProgramName (FileList);
+
+CONST
+  (* Constant declarations *)
+
+TYPE
+  (* Type declarations *)
+
+VAR
+  (* Variable declarations *)
+
+(* Subprogram definitions *)
+
+BEGIN
+  (* Executable statements *)
+END.
+
+ *)
 
 (*-------------------Program part-----------------------------------------------------------*)
 (* program <identifier> ; <block> .*)
 program:
-     |PROGRAM PSTRING block DOT EOF { Program($2, $3) }
+     |PROGRAM PSTRING block EOF { Program($2, $3) }
 
 block:
-     | opt_variable_declaration_list; statement;{ Block($1, [], $2) }
+     | opt_variable_declaration_list statement_part{ Block($1, [], $2) }
     ;
 (*------------------------------------------------------------------------------------------*)
 
 (*-------------------Variable declaration part----------------------------------------------*)
 opt_variable_declaration_list: 
     |                                             { [] }
-    | variable_declaration_list                   { $1 }
+    | VAR variable_declaration_list                   { $2 }
     ;
 
 variable_declaration_list:
-    | variable_field                     { [$1] }
-    | variable_field  variable_declaration_list { $1::$2 }
+    | variable_field                     { $1 }
+    | variable_field  variable_declaration_list { $1@$2 }
     ;
 
 variable_field:
-    VAR ide COLON ptype SEMICOLON {VariableDeclaration($2, $4)};
+    separated_nonempty_list(COMMA, ide) COLON ptype SEMICOLON {vars_to_list $1 $3};
 (*------------------------------------------------------------------------------------------*)
 
 
 (*-------------------Statement declaration part---------------------------------------------*)
 
+statement_part:
+    | BEGIN statement_list END DOT {STMTBlock($2)}
 
 statement:
     (*Mudar este ide para outra coisa, caso se use arrays*)
     | variable ASSIGN exp SEMICOLON                       { STMTAss($1,$3) }
-    | BEGIN opt_statement_list END SEMICOLON              { STMTBlock($2) }
+    | BEGIN statement_list END SEMICOLON              { STMTBlock($2) }
     | FOR ide ASSIGN arithexp TO arithexp DO statement    { STMTFor($2, $4, $6, $8) }
-    | IF booleanexp THEN statement opt_else               { STMTIf($2,$4,$5) }
-    | ide LP opt_exp_list RP SEMICOLON                    { STMTSubprogramCall($1,$3) }
+    | IF LP booleanexp RP THEN statement ELSE statement         { STMTIf($3,$6,Some $8) }
+    | IF LP booleanexp RP THEN statement                        { STMTIf($3,$6,None) }
+    | ide LP separated_list(COMMA, exp) RP SEMICOLON                    { STMTSubprogramCall($1,$3) }
     | WHILE booleanexp DO statement                       { STMTWhile($2,$4) }
-    | WRITE LP opt_exp_list RP SEMICOLON                  { STMTWrite($3) }
+    | WRITE LP separated_list(COMMA, exp) RP SEMICOLON                  { STMTWrite($3) }
     | READ LP variable RP SEMICOLON                       { STMTRead($3) }
-    ;
-
-
-opt_else:
-    | {None}
-    | ELSE statement {Some $2}
-
-
-opt_statement_list:
-    |                                               { [] }
-    | statement_list                                { $1 }
     ;
 
 statement_list
@@ -100,10 +119,6 @@ statement_list
 (*------------------------------------------------------------------------------------------*)
 (*-------------------Expression declaration part--------------------------------------------*)
 
-
-opt_exp_list:
-    |                                           {[]}
-    |exp_list                                   {$1}
 
 exp_list:
     |exp                                           {[$1]}
@@ -124,7 +139,7 @@ arithvalue:
 arithexp:
     | INT          {Integer($1)}
     | REAL         {Real($1)}
-    (*| variable     {NumVar($1})*)
+    | ide {NumVar($1)}
     | arithexp PLUS arithexp {SUM($1,$3)}
     | arithexp MINUS arithexp {SUB($1,$3)}
     | arithexp TIMES arithexp {MUL($1,$3)}
@@ -134,6 +149,7 @@ arithexp:
 booleanexp:
     | TRUE {B(true)}
     | FALSE {B(false)}
+    | ide {BoolVar($1)}
     | arithexp EQUAL arithexp {Equ($1, $3)}
     | arithexp LESSEQUAL arithexp {LE($1, $3)}
     | arithexp LESS arithexp {LT($1, $3)}
@@ -146,6 +162,26 @@ booleanexp:
 
 miscexp:
     | PSTRING {PString($1)}
+
+
+(*------------------------------------------------------------------------------------------*)
+(*-----------------------------Subprogram stuff :) STUFF :)-----------------------------------------------*)
+opt_subprogram_list
+    :                                             { [] }
+    | subprogram_list                                   { $1 }
+    ;
+
+subprogram_list
+    : subprogram                                                 { [$1] }
+    | subprogram  subprogram_list                    { $1::$2 }
+    ;
+
+subprogram
+    : PROCEDURE ide LP separated_list(COMMA, variable_field) RP block
+	                                          { ProcedureDeclaration($2,$4,$6) }
+    | FUNCTION ide LP separated_list(COMMA, variable_field) RP COLON ptype block
+	                                          { Func($2, $4, $8, $7) }
+    ;
 
 (*------------------------------------------------------------------------------------------*)
 (*-----------------------------OTHER STUFF :)-----------------------------------------------*)
@@ -168,3 +204,5 @@ ide:
     | IDE {Ident($1)}
 ;
 (*------------------------------------------------------------------------------------------*)
+
+
