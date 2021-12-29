@@ -4,6 +4,7 @@ open Ast;;
 
 let vars_to_list var_ides var_type =
     List.map (fun x -> VariableDeclaration(x, var_type)) var_ides
+
 %}
 
 %token <string>   IDE
@@ -71,11 +72,9 @@ END.
 (*-------------------Program part-----------------------------------------------------------*)
 (* program <identifier> ; <block> .*)
 program:
-     |PROGRAM PSTRING block EOF { Program($2, $3) }
+     |PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF { Program($2, $3, $4, $5) }
+     ;
 
-block:
-     | opt_variable_declaration_list statement_part{ Block($1, [], $2) }
-    ;
 (*------------------------------------------------------------------------------------------*)
 
 (*-------------------Variable declaration part----------------------------------------------*)
@@ -177,11 +176,14 @@ subprogram_list
     ;
 
 subprogram
-    : PROCEDURE ide LP separated_list(COMMA, variable_field) RP block
-	                                          { ProcedureDeclaration($2,$4,$6) }
-    | FUNCTION ide LP separated_list(COMMA, variable_field) RP COLON ptype block
-	                                          { Func($2, $4, $8, $7) }
+    : PROCEDURE ide LP flatten(separated_list(COMMA, parameter)) RP SEMICOLON opt_variable_declaration_list statement_part 
+	                                          { ProcedureDeclaration($2,$4,$7, $8) }
+    | FUNCTION ide LP flatten(separated_list(COMMA, parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part
+	                                          { FunctionDeclaration($2,$4,$9,$10, $7) }
     ;
+
+parameter:
+    | separated_nonempty_list(COMMA, ide) COLON ptype {vars_to_list $1 $3};
 
 (*------------------------------------------------------------------------------------------*)
 (*-----------------------------OTHER STUFF :)-----------------------------------------------*)
