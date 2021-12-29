@@ -61,5 +61,7 @@ begin
 
     write(cebola, 4 + 1);
     write(numero & true);
+    write(max(4,5));
+    x := max(9, 10);
 
 end.

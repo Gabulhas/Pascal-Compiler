@@ -101,11 +101,11 @@ statement:
     (*Mudar este ide para outra coisa, caso se use arrays*)
     | variable ASSIGN exp SEMICOLON                       { STMTAss($1,$3) }
     | BEGIN statement_list END SEMICOLON              { STMTBlock($2) }
-    | FOR ide ASSIGN arithexp TO arithexp DO statement    { STMTFor($2, $4, $6, $8) }
-    | IF LP booleanexp RP THEN statement ELSE statement         { STMTIf($3,$6,Some $8) }
-    | IF LP booleanexp RP THEN statement                        { STMTIf($3,$6,None) }
+    | FOR ide ASSIGN exp TO exp DO statement    { STMTFor($2, $4, $6, $8) }
+    | IF LP exp RP THEN statement ELSE statement         { STMTIf($3,$6,Some $8) }
+    | IF LP exp RP THEN statement                        { STMTIf($3,$6,None) }
     | ide LP separated_list(COMMA, exp) RP SEMICOLON                    { STMTSubprogramCall($1,$3) }
-    | WHILE booleanexp DO statement                       { STMTWhile($2,$4) }
+    | WHILE exp DO statement                       { STMTWhile($2,$4) }
     | WRITE LP separated_list(COMMA, exp) RP SEMICOLON                  { STMTWrite($3) }
     | READ LP variable RP SEMICOLON                       { STMTRead($3) }
     ;
@@ -118,47 +118,26 @@ statement_list
 (*-------------------Expression declaration part--------------------------------------------*)
 
 
-exp_list:
-    |exp                                           {[$1]}
-    |exp exp_list                                   {$1::$2}
-
 exp:
-    | arithexp      {ArithExp($1)}
-    | booleanexp    {BooleanExp($1)}
-    | miscexp       {MiscExp($1)}
-
-
-(*
-arithvalue:
-| ide     {NumVar($1)}
-| arithexp     {$1} 
-*)
-
-arithexp:
     | INT          {Integer($1)}
-    | ide {NumVar($1)}
-    | arithexp PLUS arithexp {SUM($1,$3)}
-    | arithexp MINUS arithexp {SUB($1,$3)}
-    | arithexp TIMES arithexp {MUL($1,$3)}
-    | arithexp DIVISION arithexp {DIV($1,$3)}
-    | LP arithexp RP                 { $2 }
-
-booleanexp:
+    | PSTRING {PString($1)}
     | TRUE {B(true)}
     | FALSE {B(false)}
-    | ide {BoolVar($1)}
-    | arithexp EQUAL arithexp {Equ($1, $3)}
-    | arithexp LESSEQUAL arithexp {LE($1, $3)}
-    | arithexp LESS arithexp {LT($1, $3)}
-    | arithexp GREATEREQUAL arithexp {GE($1, $3)}
-    | arithexp GREATER arithexp {GT($1, $3)}
-    | NOT booleanexp {NOT($2)}
-    | booleanexp AND booleanexp {AND($1,$3)}
-    | booleanexp OR booleanexp {OR($1,$3)}
-    | LP booleanexp RP             { $2 }
-
-miscexp:
-    | PSTRING {PString($1)}
+    | ide {Var($1)}
+    | exp PLUS exp {SUM($1,$3)}
+    | exp MINUS exp {SUB($1,$3)}
+    | exp TIMES exp {MUL($1,$3)}
+    | exp DIVISION exp {DIV($1,$3)}
+    | exp EQUAL exp {Equ($1, $3)}
+    | exp LESSEQUAL exp {LE($1, $3)}
+    | exp LESS exp {LT($1, $3)}
+    | exp GREATEREQUAL exp {GE($1, $3)}
+    | exp GREATER exp {GT($1, $3)}
+    | NOT exp {NOT($2)}
+    | exp AND exp {AND($1,$3)}
+    | exp OR exp {OR($1,$3)}
+    | ide LP separated_list(COMMA, exp) RP { CALL($1,$3) }
+    | LP exp RP             { $2 }
 
 
 (*------------------------------------------------------------------------------------------*)
@@ -196,7 +175,7 @@ stype:
     | TCHAR {TypeChar}
 
 variable:
-    | ide LS arithexp RS {IndexedVar($1, $3)}
+    | ide LS exp RS {IndexedVar($1, $3)}
     | ide {EntireVar($1)}
 
 ide:
