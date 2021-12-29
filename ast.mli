@@ -84,7 +84,6 @@ and booleanexp =
 and miscexp =
     | PString of string
     | PChar of char
-	| VAR of ident
 
 (*EntireVar -> batata(a) *)
 (*IndexedVar -> batata(a[1]) *)

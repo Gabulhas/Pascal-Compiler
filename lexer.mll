@@ -80,7 +80,6 @@ rule lex =
       | ")"             { RP }
       | "["             { LS }
       | "]"             { RS }
-      | "\""            { QUOTE }
 
       | "."             { DOT }
 

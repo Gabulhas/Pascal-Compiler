@@ -7,7 +7,6 @@ type token =
   | VAR
   | TSTRING
   | TRUE
-  | TREAL
   | TO
   | TINT
   | TIMES
@@ -17,9 +16,7 @@ type token =
   | SEMICOLON
   | RS
   | RP
-  | REAL of (float)
   | READ
-  | QUOTE
   | PSTRING of (string)
   | PROGRAM
   | PROCEDURE

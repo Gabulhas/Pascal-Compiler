@@ -1,5 +1,5 @@
 
-** Conflict (reduce/reduce) in state 46.
+** Conflict (reduce/reduce) in state 44.
 ** Tokens involved: SEMICOLON RP COMMA
 ** The following explanations concentrate on token RP.
 ** This state is reached from program after reading:
@@ -18,14 +18,14 @@ PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part
                                                                                  exp // lookahead token is inherited
                                                                                  (?)
 
-** In state 46, looking ahead at RP, reducing production
+** In state 44, looking ahead at RP, reducing production
 ** arithexp -> ide
 ** is permitted because of the following sub-derivation:
 
 arithexp // lookahead token is inherited
 ide . 
 
-** In state 46, looking ahead at RP, reducing production
+** In state 44, looking ahead at RP, reducing production
 ** booleanexp -> ide
 ** is permitted because of the following sub-derivation:
 

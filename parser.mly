@@ -9,14 +9,13 @@ let vars_to_list var_ides var_type =
 
 %token <string>   IDE
 %token <int>      INT
-%token <float>    REAL
 %token <bool>     PBOOLEAN
 %token <string>   PSTRING
 %token <char>     PCHAR
 
 %token            TRUE FALSE
 
-%token            PROGRAM VAR ARRAY OF TINT TREAL TBOOLEAN TCHAR TSTRING PROCEDURE FUNCTION BEGIN END
+%token            PROGRAM VAR ARRAY OF TINT TBOOLEAN TCHAR TSTRING PROCEDURE FUNCTION BEGIN END
 %token            IF THEN ELSE WHILE DO FOR TO WRITE READ
 
 %token            PLUS MINUS TIMES DIVISION EQUAL LESSEQUAL LESS AND OR NOT
@@ -24,7 +23,7 @@ let vars_to_list var_ides var_type =
 
 %token            SEMICOLON COLON COMMA
 
-%token            LS RS LP RP QUOTE
+%token            LS RS LP RP
 
 %token            GREATEREQUAL GREATER
 
@@ -36,7 +35,7 @@ let vars_to_list var_ides var_type =
 %left OR
 %left AND
 %nonassoc NOT
-%nonassoc LT LE GT GE EQ NE
+%nonassoc LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOTEQUAL
 %left MINUS PLUS
 %left TIMES DIVISION
 %nonassoc LS
@@ -137,7 +136,6 @@ arithvalue:
 
 arithexp:
     | INT          {Integer($1)}
-    | REAL         {Real($1)}
     | ide {NumVar($1)}
     | arithexp PLUS arithexp {SUM($1,$3)}
     | arithexp MINUS arithexp {SUB($1,$3)}
@@ -193,7 +191,6 @@ ptype:
 
 stype:
     | TINT {TypeInteger}
-    | TREAL {TypeReal}
     | TBOOLEAN {TypeBoolean}
     | TSTRING {TypeString}
     | TCHAR {TypeChar}
