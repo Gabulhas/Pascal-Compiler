@@ -2,6 +2,8 @@
 
 open Ast;;
 
+
+
 let vars_to_list var_ides var_type =
     List.map (fun x -> VariableDeclaration(x, var_type)) var_ides
 
@@ -29,8 +31,6 @@ let vars_to_list var_ides var_type =
 
 %token            DOT
 %token            EOF
-
-
 
 %left OR
 %left AND
@@ -88,7 +88,7 @@ variable_declaration_list:
     ;
 
 variable_field:
-    separated_nonempty_list(COMMA, ide) COLON ptype SEMICOLON {vars_to_list $1 $3};
+    | separated_nonempty_list(COMMA, ide) COLON ptype SEMICOLON {vars_to_list $1 $3}
 (*------------------------------------------------------------------------------------------*)
 
 
@@ -123,7 +123,8 @@ exp:
     | PSTRING {PString($1)}
     | TRUE {B(true)}
     | FALSE {B(false)}
-    | ide {Var($1)}
+    | ide {Var(EntireVar($1))}
+    | ide LS exp RS  {Var(IndexedVar($1,$3 ))}
     | exp PLUS exp {SUM($1,$3)}
     | exp MINUS exp {SUB($1,$3)}
     | exp TIMES exp {MUL($1,$3)}
@@ -166,7 +167,7 @@ parameter:
 (*-----------------------------OTHER STUFF :)-----------------------------------------------*)
 ptype: 
     | stype {Simpletype($1)}
-
+    | ARRAY LS INT DOT DOT INT RS OF stype {ArrayType($3, $6, $9)}
 
 stype:
     | TINT {TypeInteger}

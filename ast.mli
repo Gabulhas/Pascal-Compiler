@@ -1,7 +1,5 @@
 (* based on https://web.archive.org/web/20081028194213/https://www.cs.helsinki.fi/u/vihavain/k06/okk/items/minipascalsyntax.html *)
 
-(*TODO remove RECs and Vector/Matrix stuff*)
-
 type ident = Ident of string
 
 (*PROCEDURE (ident: name) (variable_declaration list: arguments) ....*)
@@ -15,7 +13,7 @@ and variable_declaration = VariableDeclaration of ident * pascaltype
 
 (* <type> ::=	<simple type> | <array type> *)
 (* <array type> ::=	array [ <index range> ] of <simple type> *)
-and pascaltype = Simpletype of simpletype | PArrayType of int * simpletype
+and pascaltype = Simpletype of simpletype | ArrayType of int * int * simpletype
 
 and simpletype  =  | TypeInteger 
                    | TypeReal 
@@ -59,7 +57,7 @@ and exp =
     | PString of string
     | PChar of char
     | B of bool
-    | Var of ident
+    | Var of variable
     | SUM of exp * exp
     | SUB of exp * exp
     | MUL of exp * exp

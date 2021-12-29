@@ -33,7 +33,7 @@ rule lex =
 
       | "program"       { PROGRAM }
       | "var"           { VAR }
-      | "array"         { ARRAY }
+      | "Array"         { ARRAY }
       | "of"            { OF }
       | "int"           { TINT }
       | "boolean"       { TBOOLEAN }
