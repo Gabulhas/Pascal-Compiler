@@ -159,14 +159,14 @@ let vars_to_list var_ides var_type =
 
 [@@@ocaml.warning "-4-39"]
 
-let rec _menhir_goto_subprogram_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.subprogam_declaration list) -> 'ttv_return =
+let rec _menhir_goto_subprogram_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.subprogram_declaration list) -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s _v ->
     match _menhir_s with
     | MenhirState29 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
-        let (_1 : (Ast.subprogam_declaration list)) = _v in
-        let _v : (Ast.subprogam_declaration list) = 
+        let (_1 : (Ast.subprogram_declaration list)) = _v in
+        let _v : (Ast.subprogram_declaration list) = 
 # 148 "parser.mly"
                                                         ( _1 )
 # 173 "parser.ml"
@@ -175,9 +175,9 @@ let rec _menhir_goto_subprogram_list : _menhir_env -> 'ttv_tail -> _menhir_state
     | MenhirState151 ->
         let _menhir_stack = Obj.magic _menhir_stack in
         let _menhir_stack = Obj.magic _menhir_stack in
-        let (_2 : (Ast.subprogam_declaration list)) = _v in
-        let (_menhir_stack, _menhir_s, (_1 : (Ast.subprogam_declaration))) = _menhir_stack in
-        let _v : (Ast.subprogam_declaration list) = 
+        let (_2 : (Ast.subprogram_declaration list)) = _v in
+        let (_menhir_stack, _menhir_s, (_1 : (Ast.subprogram_declaration))) = _menhir_stack in
+        let _v : (Ast.subprogram_declaration list) = 
 # 153 "parser.mly"
                                                      ( _1::_2 )
 # 184 "parser.ml"
@@ -241,7 +241,7 @@ and _menhir_goto_variable_declaration_list : _menhir_env -> 'ttv_tail -> _menhir
     | _ ->
         _menhir_fail ()
 
-and _menhir_goto_subprogram : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.subprogam_declaration) -> 'ttv_return =
+and _menhir_goto_subprogram : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.subprogram_declaration) -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s _v ->
     let _menhir_stack = (_menhir_stack, _menhir_s, _v) in
     let _menhir_stack = Obj.magic _menhir_stack in
@@ -254,8 +254,8 @@ and _menhir_goto_subprogram : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.
         _menhir_run30 _menhir_env (Obj.magic _menhir_stack) MenhirState151
     | BEGIN ->
         let _menhir_stack = Obj.magic _menhir_stack in
-        let (_menhir_stack, _menhir_s, (_1 : (Ast.subprogam_declaration))) = _menhir_stack in
-        let _v : (Ast.subprogam_declaration list) = 
+        let (_menhir_stack, _menhir_s, (_1 : (Ast.subprogram_declaration))) = _menhir_stack in
+        let _v : (Ast.subprogram_declaration list) = 
 # 152 "parser.mly"
                                                                  ( [_1] )
 # 262 "parser.ml"
@@ -468,7 +468,7 @@ and _menhir_goto_statement_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (
 # 158 "parser.mly"
                                            ( ProcedureDeclaration(_2,_4,_7, _8) )
 # 471 "parser.ml"
-                       : (Ast.subprogam_declaration))
+                       : (Ast.subprogram_declaration))
                     in
                     _menhir_goto_subprogram _menhir_env _menhir_stack _menhir_s _v
                 | MenhirState148 ->
@@ -492,7 +492,7 @@ and _menhir_goto_statement_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (
 # 160 "parser.mly"
                                            ( FunctionDeclaration(_2,_4,_9,_10, _7) )
 # 495 "parser.ml"
-                       : (Ast.subprogam_declaration))
+                       : (Ast.subprogram_declaration))
                     in
                     _menhir_goto_subprogram _menhir_env _menhir_stack _menhir_s _v
                 | MenhirState153 ->
@@ -507,7 +507,7 @@ and _menhir_goto_statement_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (
 # 15 "parser.mly"
        (string)
 # 510 "parser.ml"
-                        ))), _, (_3 : (Ast.variable_declaration list))), _, (_4 : (Ast.subprogam_declaration list))), _, (_5 : (Ast.statement))) = _menhir_stack in
+                        ))), _, (_3 : (Ast.variable_declaration list))), _, (_4 : (Ast.subprogram_declaration list))), _, (_5 : (Ast.statement))) = _menhir_stack in
                         let _v : (Ast.program) = 
 # 74 "parser.mly"
                                                                                            ( Program(_2, _3, _4, _5) )
@@ -1579,7 +1579,7 @@ and _menhir_run44 : _menhir_env -> 'ttv_tail -> _menhir_state -> 'ttv_return =
         _menhir_env._menhir_error <- true;
         _menhir_errorcase _menhir_env (Obj.magic _menhir_stack) MenhirState44
 
-and _menhir_goto_opt_subprogram_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.subprogam_declaration list) -> 'ttv_return =
+and _menhir_goto_opt_subprogram_list : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.subprogram_declaration list) -> 'ttv_return =
   fun _menhir_env _menhir_stack _menhir_s _v ->
     let _menhir_stack = (_menhir_stack, _menhir_s, _v) in
     let _menhir_stack = Obj.magic _menhir_stack in
@@ -2688,7 +2688,7 @@ and _menhir_goto_opt_variable_declaration_list : _menhir_env -> 'ttv_tail -> _me
         | BEGIN ->
             let _menhir_stack = Obj.magic _menhir_stack in
             let _menhir_s = MenhirState29 in
-            let _v : (Ast.subprogam_declaration list) = 
+            let _v : (Ast.subprogram_declaration list) = 
 # 147 "parser.mly"
                                                   ( [] )
 # 2695 "parser.ml"

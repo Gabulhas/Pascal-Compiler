@@ -1,2 +1,5 @@
 #load "parser.cmo";;
 #load "lexer.cmo";;
+#load "typechecker.cmo";;
+#load "codegeneration.cmo";;
+#load "main.cmo";;

@@ -5,6 +5,7 @@ numero : int;
 x : int;
 num : int;
 intervalo: int;
+cebola:int;
 listaa, listab : Array [1..20] of int;
 listac, listad : Array [1..20] of boolean;
 
@@ -15,6 +16,7 @@ var
 begin
     listaa[4] := 5;
     write("hey");
+    batata := kek;
 end.
 
 procedure write_value(num: int);
@@ -38,7 +40,7 @@ begin
         x:=1;
 
     write(cebola, 4 + 1);
-    write(numero & true);
+    write(numero);
     write(max(4,5));
     x := max(9, 10);
     listaa[x] := 5;
