@@ -1,9 +1,9 @@
 (* based on https://web.archive.org/web/20081028194213/https://www.cs.helsinki.fi/u/vihavain/k06/okk/items/minipascalsyntax.html *)
 
-type ident = Ident of string
+type ident = string
 
 (*PROCEDURE (ident: name) (variable_declaration list: arguments) ....*)
-and program = Program of string * variable_declaration list * subprogam_declaration list * statement
+and program = Program of string * variable_declaration list * subprogram_declaration list * statement
 
 
 (*-------------------Variable declaration part----------------------------------------------*)
@@ -27,7 +27,7 @@ and simpletype  =  | TypeInteger
 (*-------------------Procedure declaration part---------------------------------------------*)
 
 (* <procedure declaration> ::=	procedure <identifier> ; <block> *)
-and subprogam_declaration =
+and subprogram_declaration =
     | ProcedureDeclaration of ident * variable_declaration list * variable_declaration list * statement
 
     (* Last value is the return type*)
@@ -39,8 +39,7 @@ and subprogam_declaration =
 (*-------------------Statement declaration part---------------------------------------------*)
 
                 
-and statement = | STMTAss of variable * exp
-                (*Begin...End*)
+and statement = | STMTAss of variable * exp (*Begin...End*)
                 | STMTBlock of statement list
                 | STMTFor of ident * exp * exp * statement
                 (*<if statement> ::=	if <expression> then <statement> | if <expression> then <statement> else <statement>  option because it might have an else statement or not *)

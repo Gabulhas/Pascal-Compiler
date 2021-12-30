@@ -2738,7 +2738,7 @@ and _menhir_run4 : _menhir_env -> 'ttv_tail -> _menhir_state -> (
     )) = _v in
     let _v : (Ast.ident) = 
 # 183 "parser.mly"
-          (Ident(_1))
+          (_1)
 # 2743 "parser.ml"
      in
     let _menhir_stack = (_menhir_stack, _menhir_s, _v) in
