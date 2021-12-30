@@ -4,9 +4,8 @@ var
 numero : int;
 x : int;
 num : int;
-intervalo: int;
 cebola:int;
-listaa, listab : Array [1..20] of int;
+listaa, listab, intervalo : Array [1..20] of int;
 listac, listad : Array [1..20] of boolean;
 
 function cebola(batata:int): int;
@@ -24,6 +23,14 @@ begin
     write(num);
 end.
 
+function max(a, b:int): int;
+begin 
+    if(a > b) then
+        max := a;
+    else 
+        max := b;
+
+end.
 
 begin
     write("Digite um numero: ");
@@ -43,7 +50,9 @@ begin
     write(numero);
     write(max(4,5));
     x := max(9, 10);
+    listaa := listab;
     listaa[x] := 5;
     x := listaa[x];
+    listaa[4] := 4;
 
 end.

@@ -5,7 +5,6 @@ module VariableMap = Map.Make (struct
 
   let compare = compare
 end)
-
 module ParameterMap = Map.Make (struct
   type t = ident
 
@@ -13,7 +12,10 @@ module ParameterMap = Map.Make (struct
 end)
 
 exception VariableNotDeclared of string
+exception SubprogramNotDeclared of string
 exception TypeMismatch of string
+exception ParametersMismatch of string
+exception NotAnArray of string
 
 let rec simpletype_to_string = function
   | TypeInteger -> "Integer"
@@ -21,14 +23,32 @@ let rec simpletype_to_string = function
   | TypeBoolean -> "Boolean"
   | TypeString -> "String"
   | TypeChar -> "Char"
+  | TypeNull -> "Null"
 
 let rec type_to_string = function
-  | Simpletype a -> simpletype_to_string a
+  | SimpleType a -> simpletype_to_string a
   | ArrayType (a, b, c) ->
       Printf.sprintf "Array[%d..%d] of %s" a b (simpletype_to_string c)
 
 let raise_variable_not_declared i =
   raise (VariableNotDeclared (Printf.sprintf "Variable %s not found!" i))
+
+let raise_subprogram_not_declared i =
+  raise
+    (SubprogramNotDeclared
+       (Printf.sprintf "Function/Procedure \"%s\" not found!" i))
+
+let raise_parameters_mismatch i params calls =
+  let params_to_string p =
+    [ "("; String.concat "," (List.map type_to_string params); ")" ]
+    |> String.concat ""
+  in
+  let params_string = params_to_string params in
+  let calls_string = params_to_string calls in
+
+  raise
+    (ParametersMismatch
+       (Printf.sprintf "While calling %s: %s != %s" i params_string calls_string))
 
 let raise_type_mismatched a b =
   let a_string = type_to_string a in
@@ -41,6 +61,12 @@ let raise_simpletype_mismatched a b =
   let b_string = simpletype_to_string b in
   raise
     (TypeMismatch (Printf.sprintf "Expected %s but got %s" a_string b_string))
+
+let raise_not_an_array i =
+  raise (VariableNotDeclared (Printf.sprintf "%s is not an array" i))
+
+let get_array_element_type v t =
+  match t with ArrayType (_, _, v) -> SimpleType(v) | SimpleType _ -> raise_not_an_array v
 
 let get_var_type_from_ident i map =
   match VariableMap.find_opt i map with
@@ -58,78 +84,132 @@ let rec add_vars_to_map varlist varmap =
       add_vars_to_map tl (VariableMap.add i t varmap)
   | [] -> varmap
 
-let get_sympletype = function Simpletype a -> a | ArrayType (_, _, a) -> a
+let rec add_function_returns_to_map subprogram_list varmap =
+  match subprogram_list with
+  | FunctionDeclaration (i, _, _, _, rtrn) :: tl ->
+      add_function_returns_to_map tl (VariableMap.add i rtrn varmap)
+  | ProcedureDeclaration (i, _, _, _) :: tl ->
+      add_function_returns_to_map tl
+        (VariableMap.add i (SimpleType TypeNull) varmap)
+  | [] -> varmap
+
+let get_sympletype = function SimpleType a -> a | ArrayType (_, _, a) -> a
+
 
 let compare_pascaltypes a b =
   match (a, b) with
-  | Simpletype x, Simpletype y -> x == y
+  | SimpleType x, SimpleType y -> x == y
   | ArrayType (_, _, x), ArrayType (_, _, y) -> x == y
   | _ -> false
 
-let is_simpletype_expected expected operands =
+let is_type_expected expected operands =
   List.iter
-    (fun x -> if expected != x then raise_simpletype_mismatched expected x)
+    (fun x ->
+      if not (compare_pascaltypes expected x) then
+        raise_type_mismatched expected x)
     operands;
   expected
 
+let are_parameters_expected funname paramlist explist =
+  if List.equal (fun x y -> compare_pascaltypes x y) paramlist explist then ()
+  else raise_parameters_mismatch funname paramlist explist
+
 let rec functions_to_parameters_map funlist paramsmap =
   match funlist with
-  | ProcedureDeclaration (i, params, _, _) :: tl ->
+  | ProcedureDeclaration (i, params, _, _s) :: tl ->
       functions_to_parameters_map tl (ParameterMap.add i params paramsmap)
   | FunctionDeclaration (i, params, _, _, _) :: tl ->
       functions_to_parameters_map tl (ParameterMap.add i params paramsmap)
   | [] -> paramsmap
 
-
-
-
 let rec check_expression expression varmap paramsmap =
   let check_complex expected operands =
-    is_simpletype_expected expected
+    is_type_expected expected
       (List.map (fun x -> check_expression x varmap paramsmap) operands)
   in
   match expression with
-  | Integer _ -> TypeInteger
-  | PString _ -> TypeString
-  | PChar a -> TypeChar
-  | B _ -> TypeBoolean
-  | Var a -> get_var_type_from_var a varmap |> get_sympletype
-  | SUM (a, b) -> check_complex TypeInteger [ a; b ]
-  | SUB (a, b) -> check_complex TypeInteger [ a; b ]
-  | MUL (a, b) -> check_complex TypeInteger [ a; b ]
-  | DIV (a, b) -> check_complex TypeInteger [ a; b ]
+  | Integer _ -> SimpleType TypeInteger
+  | PString _ -> SimpleType TypeString
+  | PChar a -> SimpleType TypeChar
+  | B _ -> SimpleType TypeBoolean
+  (*this should include arrays*)
+  | Var a ->( 
+        match a with
+        | EntireVar a -> get_var_type_from_ident a varmap
+        | IndexedVar (a, b) ->
+            let index_exp = check_expression b varmap paramsmap in
+            is_type_expected (SimpleType TypeInteger) [ index_exp ] |> ignore;
+            get_array_element_type a (get_var_type_from_ident a varmap)
+  )
+
+  | SUM (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
+  | SUB (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
+  | MUL (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
+  | DIV (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
   | Equ (a, b) ->
-      check_complex TypeInteger [ a; b ] |> ignore;
-      TypeBoolean
+      check_complex (SimpleType TypeInteger) [ a; b ] |> ignore;
+      SimpleType TypeBoolean
   | LE (a, b) ->
-      check_complex TypeInteger [ a; b ] |> ignore;
-      TypeBoolean
+      check_complex (SimpleType TypeInteger) [ a; b ] |> ignore;
+      SimpleType TypeBoolean
   | LT (a, b) ->
-      check_complex TypeInteger [ a; b ] |> ignore;
-      TypeBoolean
+      check_complex (SimpleType TypeInteger) [ a; b ] |> ignore;
+      SimpleType TypeBoolean
   | GE (a, b) ->
-      check_complex TypeInteger [ a; b ] |> ignore;
-      TypeBoolean
+      check_complex (SimpleType TypeInteger) [ a; b ] |> ignore;
+      SimpleType TypeBoolean
   | GT (a, b) ->
-      check_complex TypeInteger [ a; b ] |> ignore;
-      TypeBoolean
-  | NOT a -> check_complex TypeBoolean [ a ]
-  | AND (a, b) -> check_complex TypeBoolean [ a ]
-  | OR (a, b) -> check_complex TypeBoolean [ a ]
-  (*TODO complete tomorrow*)
-  | CALL (a, b) -> check_expression (List.hd b) varmap paramsmap
+      check_complex (SimpleType TypeInteger) [ a; b ] |> ignore;
+      SimpleType TypeBoolean
+  | NOT a -> check_complex (SimpleType TypeBoolean) [ a ]
+  | AND (a, b) -> check_complex (SimpleType TypeBoolean) [ a ]
+  | OR (a, b) -> check_complex (SimpleType TypeBoolean) [ a ]
+  | CALL (a, b) ->
+      let returntype_opt = VariableMap.find_opt a varmap in
+      let returntype =
+        match returntype_opt with
+        | Some a -> a
+        | None -> raise_subprogram_not_declared a
+      in
+
+      let exp_types =
+        List.map (fun x -> check_expression x varmap paramsmap) b
+      in
+      let paramslist_opt = ParameterMap.find_opt a paramsmap in
+      let paramslist =
+        match paramslist_opt with
+        | Some a ->
+            List.map
+              (fun x -> match x with VariableDeclaration (_, tp) -> tp)
+              a
+        | None -> []
+      in
+      are_parameters_expected a paramslist exp_types;
+      returntype
 
 let rec check_statements statement varmap paramsmap =
   match statement with
   | STMTAss (a, e) ->
+      let i, isIndexed =
+        match a with
+        | EntireVar a -> (a, false)
+        | IndexedVar (a, b) ->
+            let index_exp = check_expression b varmap paramsmap in
+            is_type_expected (SimpleType TypeInteger) [ index_exp ] |> ignore;
+            (a, true)
+      in
       let e_type = check_expression e varmap paramsmap in
-      let a_type = get_var_type_from_var a varmap |> get_sympletype in
-      is_simpletype_expected a_type [ e_type ] |> ignore
+      let a_type =
+        if isIndexed then
+          get_array_element_type i (get_var_type_from_ident i varmap)
+        else get_var_type_from_ident i varmap
+      in
+      is_type_expected a_type [ e_type ] |> ignore
   | STMTBlock stmt_list ->
       List.iter (fun x -> check_statements x varmap paramsmap) stmt_list
   | STMTFor (a, b, c, d) ->
-      let a_type = get_var_type_from_ident a varmap |> get_sympletype in
-      is_simpletype_expected TypeInteger
+      let a_type = get_var_type_from_ident a varmap in
+      is_type_expected (SimpleType TypeInteger)
         [
           a_type;
           check_expression b varmap paramsmap;
@@ -138,7 +218,8 @@ let rec check_statements statement varmap paramsmap =
       |> ignore;
       check_statements d varmap paramsmap
   | STMTIf (e, tn, el) -> (
-      is_simpletype_expected TypeBoolean [ check_expression e varmap paramsmap ]
+      is_type_expected (SimpleType TypeBoolean)
+        [ check_expression e varmap paramsmap ]
       |> ignore;
       check_statements tn varmap paramsmap;
       match el with Some a -> check_statements a varmap paramsmap | None -> ())
@@ -146,7 +227,8 @@ let rec check_statements statement varmap paramsmap =
   (*Compare exp list to argument list types*)
   | STMTSubprogramCall (_, _) -> ()
   | STMTWhile (e, st) ->
-      is_simpletype_expected TypeBoolean [ check_expression e varmap paramsmap ]
+      is_type_expected (SimpleType TypeBoolean)
+        [ check_expression e varmap paramsmap ]
       |> ignore;
       check_statements st varmap paramsmap
   | STMTRead _ -> ()
@@ -155,26 +237,47 @@ let rec check_statements statement varmap paramsmap =
       |> ignore
   | STMTEmpty -> ()
 
-let check_subprogram globalvarsmap paramsmap localparmslist localvarslist statement=  
-    let totalvars = globalvarsmap |> add_vars_to_map localparmslist |> add_vars_to_map localvarslist in
-    check_statements statement totalvars paramsmap;;
+let check_subprogram name globalvarsmap paramsmap localparmslist localvarslist
+    statement returntype =
+ 
+  let add_local_map map = 
+    map
+    |> add_vars_to_map localparmslist
+    |> add_vars_to_map localvarslist
+    |> VariableMap.add name returntype
+  in
+  let local_map =
+    VariableMap.empty |> add_local_map
+  in
+  let totalvars =
+    globalvarsmap |> add_local_map
+  in
+  check_statements statement totalvars paramsmap;
+  local_map
 
 let rec check_program my_program =
   let varlist, sublist, stm =
     match my_program with Program (_, a, b, c) -> (a, b, c)
   in
-  let global_map = add_vars_to_map varlist VariableMap.empty in
+  let global_map =
+    add_vars_to_map varlist VariableMap.empty
+    |> add_function_returns_to_map sublist
+  in
   let params_map = functions_to_parameters_map sublist ParameterMap.empty in
   (*Main function*)
-  check_subprogram global_map params_map [] [] stm;
-  List.iter (fun x -> 
-      match x with
-      | ProcedureDeclaration(_, prms, lclvrs, stmt) -> 
-              check_subprogram global_map params_map prms lclvrs stmt;
+  check_subprogram "main" global_map params_map [] [] stm (SimpleType TypeNull)|> ignore;
+  let subprogram_vars =
+    List.map
+      (fun x ->
+        match x with
+        | ProcedureDeclaration (name, prms, lclvrs, stmt) ->
+            check_subprogram name global_map params_map prms lclvrs stmt (SimpleType TypeNull)
+        | FunctionDeclaration (name, prms, lclvrs, stmt, t) ->
+            check_subprogram name global_map params_map prms lclvrs stmt t)
+      sublist
+  in
 
-      | FunctionDeclaration(_, prms, lclvrs, stmt, _) -> 
-              check_subprogram global_map params_map prms lclvrs stmt;
-  ) sublist;
+  global_map :: subprogram_vars
 
 (*
 

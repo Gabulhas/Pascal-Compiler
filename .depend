@@ -10,10 +10,12 @@ lexer.cmo : \
 lexer.cmx : \
     parser.cmx
 main.cmo : \
+    typechecker.cmo \
     parser.cmi \
     lexer.cmo \
     codegeneration.cmo
 main.cmx : \
+    typechecker.cmx \
     parser.cmx \
     lexer.cmx \
     codegeneration.cmx

@@ -568,7 +568,7 @@ and _menhir_goto_stype : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.simpl
         let (_1 : (Ast.simpletype)) = _v in
         let _v : (Ast.pascaltype) = 
 # 169 "parser.mly"
-            (Simpletype(_1))
+            (SimpleType(_1))
 # 573 "parser.ml"
          in
         _menhir_goto_ptype _menhir_env _menhir_stack _menhir_s _v
