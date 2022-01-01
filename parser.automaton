@@ -5,14 +5,14 @@ State 0:
 program' -> . program [ # ]
 ## Transitions:
 -- On PROGRAM shift to state 1
--- On program shift to state 156
+-- On program shift to state 153
 ## Reductions:
 
 State 1:
 ## Known stack suffix:
 ## PROGRAM
 ## LR(1) items:
-program -> PROGRAM . PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF [ # ]
+program -> PROGRAM . PSTRING block EOF [ # ]
 ## Transitions:
 -- On PSTRING shift to state 2
 ## Reductions:
@@ -21,10 +21,11 @@ State 2:
 ## Known stack suffix:
 ## PROGRAM PSTRING
 ## LR(1) items:
-program -> PROGRAM PSTRING . opt_variable_declaration_list opt_subprogram_list statement_part EOF [ # ]
+program -> PROGRAM PSTRING . block EOF [ # ]
 ## Transitions:
 -- On VAR shift to state 3
 -- On opt_variable_declaration_list shift to state 29
+-- On block shift to state 151
 ## Reductions:
 -- On PROCEDURE FUNCTION BEGIN
 --   reduce production opt_variable_declaration_list ->
@@ -46,10 +47,10 @@ State 4:
 ## Known stack suffix:
 ## IDE
 ## LR(1) items:
-ide -> IDE . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LS LP LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA COLON ASSIGN AND ]
+ide -> IDE . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LS LP LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA COLON ASSIGN AND ]
 ## Transitions:
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LS LP LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA COLON ASSIGN AND
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LS LP LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA COLON ASSIGN AND
 --   reduce production ide -> IDE
 
 State 5:
@@ -302,15 +303,15 @@ opt_variable_declaration_list -> VAR variable_declaration_list . [ PROCEDURE FUN
 
 State 29:
 ## Known stack suffix:
-## PROGRAM PSTRING opt_variable_declaration_list
+## opt_variable_declaration_list
 ## LR(1) items:
-program -> PROGRAM PSTRING opt_variable_declaration_list . opt_subprogram_list statement_part EOF [ # ]
+block -> opt_variable_declaration_list . opt_subprogram_list statement_part [ PROCEDURE FUNCTION EOF BEGIN ]
 ## Transitions:
 -- On PROCEDURE shift to state 30
--- On FUNCTION shift to state 140
--- On subprogram_list shift to state 150
--- On subprogram shift to state 151
--- On opt_subprogram_list shift to state 153
+-- On FUNCTION shift to state 44
+-- On subprogram_list shift to state 53
+-- On subprogram shift to state 54
+-- On opt_subprogram_list shift to state 56
 ## Reductions:
 -- On BEGIN
 --   reduce production opt_subprogram_list ->
@@ -319,7 +320,7 @@ State 30:
 ## Known stack suffix:
 ## PROCEDURE
 ## LR(1) items:
-subprogram -> PROCEDURE . ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE . ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On IDE shift to state 4
 -- On ide shift to state 31
@@ -329,7 +330,7 @@ State 31:
 ## Known stack suffix:
 ## PROCEDURE ide
 ## LR(1) items:
-subprogram -> PROCEDURE ide . LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE ide . LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On LP shift to state 32
 ## Reductions:
@@ -338,7 +339,7 @@ State 32:
 ## Known stack suffix:
 ## PROCEDURE ide LP
 ## LR(1) items:
-subprogram -> PROCEDURE ide LP . loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE ide LP . loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On IDE shift to state 4
 -- On separated_nonempty_list(COMMA,parameter) shift to state 33
@@ -433,7 +434,7 @@ State 40:
 ## Known stack suffix:
 ## PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter))
 ## LR(1) items:
-subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) . RP SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) . RP SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On RP shift to state 41
 ## Reductions:
@@ -442,7 +443,7 @@ State 41:
 ## Known stack suffix:
 ## PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP
 ## LR(1) items:
-subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP . SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP . SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On SEMICOLON shift to state 42
 ## Reductions:
@@ -451,183 +452,329 @@ State 42:
 ## Known stack suffix:
 ## PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON
 ## LR(1) items:
-subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON . opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON . block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On VAR shift to state 3
--- On opt_variable_declaration_list shift to state 43
+-- On opt_variable_declaration_list shift to state 29
+-- On block shift to state 43
 ## Reductions:
--- On BEGIN
+-- On PROCEDURE FUNCTION BEGIN
 --   reduce production opt_variable_declaration_list ->
 
 State 43:
 ## Known stack suffix:
-## PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list
+## PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON block
 ## LR(1) items:
-subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list . statement_part [ PROCEDURE FUNCTION BEGIN ]
+subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON block . [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
--- On BEGIN shift to state 44
--- On statement_part shift to state 139
 ## Reductions:
+-- On PROCEDURE FUNCTION BEGIN
+--   reduce production subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON block
 
 State 44:
 ## Known stack suffix:
-## BEGIN
+## FUNCTION
 ## LR(1) items:
-statement_part -> BEGIN . statement_list END DOT [ PROCEDURE FUNCTION EOF BEGIN ]
+subprogram -> FUNCTION . ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement_list shift to state 136
--- On statement shift to state 124
--- On ide shift to state 126
+-- On ide shift to state 45
 ## Reductions:
 
 State 45:
 ## Known stack suffix:
-## WRITE
+## FUNCTION ide
 ## LR(1) items:
-statement -> WRITE . LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+subprogram -> FUNCTION ide . LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 -- On LP shift to state 46
 ## Reductions:
 
 State 46:
 ## Known stack suffix:
-## WRITE LP
+## FUNCTION ide LP
 ## LR(1) items:
-statement -> WRITE LP . loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+subprogram -> FUNCTION ide LP . loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On separated_nonempty_list(COMMA,exp) shift to state 80
--- On loption(separated_nonempty_list(COMMA,exp)) shift to state 89
--- On ide shift to state 53
--- On exp shift to state 83
+-- On separated_nonempty_list(COMMA,parameter) shift to state 33
+-- On separated_nonempty_list(COMMA,ide) shift to state 34
+-- On parameter shift to state 37
+-- On loption(separated_nonempty_list(COMMA,parameter)) shift to state 47
+-- On ide shift to state 25
 ## Reductions:
 -- On RP
---   reduce production loption(separated_nonempty_list(COMMA,exp)) ->
+--   reduce production loption(separated_nonempty_list(COMMA,parameter)) ->
 
 State 47:
 ## Known stack suffix:
-## TRUE
+## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter))
 ## LR(1) items:
-exp -> TRUE . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) . RP COLON ptype SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
+-- On RP shift to state 48
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> TRUE
 
 State 48:
 ## Known stack suffix:
-## PSTRING
+## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP
 ## LR(1) items:
-exp -> PSTRING . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP . COLON ptype SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
+-- On COLON shift to state 49
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> PSTRING
 
 State 49:
 ## Known stack suffix:
-## NOT
+## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON
 ## LR(1) items:
-exp -> NOT . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON . ptype SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 88
+-- On TSTRING shift to state 9
+-- On TINT shift to state 10
+-- On TCHAR shift to state 11
+-- On TBOOLEAN shift to state 12
+-- On ARRAY shift to state 13
+-- On stype shift to state 22
+-- On ptype shift to state 50
 ## Reductions:
 
 State 50:
 ## Known stack suffix:
-## LP
+## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype
 ## LR(1) items:
-exp -> LP . exp RP [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype . SEMICOLON block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 86
+-- On SEMICOLON shift to state 51
 ## Reductions:
 
 State 51:
 ## Known stack suffix:
-## INT
+## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON
 ## LR(1) items:
-exp -> INT . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON . block [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
+-- On VAR shift to state 3
+-- On opt_variable_declaration_list shift to state 29
+-- On block shift to state 52
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> INT
+-- On PROCEDURE FUNCTION BEGIN
+--   reduce production opt_variable_declaration_list ->
 
 State 52:
 ## Known stack suffix:
-## FALSE
+## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON block
 ## LR(1) items:
-exp -> FALSE . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON block . [ PROCEDURE FUNCTION BEGIN ]
 ## Transitions:
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> FALSE
+-- On PROCEDURE FUNCTION BEGIN
+--   reduce production subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON block
 
 State 53:
 ## Known stack suffix:
-## ide
+## subprogram_list
 ## LR(1) items:
-exp -> ide . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> ide . LS exp RS [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> ide . LP loption(separated_nonempty_list(COMMA,exp)) RP [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+opt_subprogram_list -> subprogram_list . [ BEGIN ]
 ## Transitions:
--- On LS shift to state 54
--- On LP shift to state 79
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> ide
+-- On BEGIN
+--   reduce production opt_subprogram_list -> subprogram_list
 
 State 54:
 ## Known stack suffix:
-## ide LS
+## subprogram
 ## LR(1) items:
-exp -> ide LS . exp RS [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+subprogram_list -> subprogram . [ BEGIN ]
+subprogram_list -> subprogram . subprogram_list [ BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 55
+-- On PROCEDURE shift to state 30
+-- On FUNCTION shift to state 44
+-- On subprogram_list shift to state 55
+-- On subprogram shift to state 54
 ## Reductions:
+-- On BEGIN
+--   reduce production subprogram_list -> subprogram
 
 State 55:
 ## Known stack suffix:
+## subprogram subprogram_list
+## LR(1) items:
+subprogram_list -> subprogram subprogram_list . [ BEGIN ]
+## Transitions:
+## Reductions:
+-- On BEGIN
+--   reduce production subprogram_list -> subprogram subprogram_list
+
+State 56:
+## Known stack suffix:
+## opt_variable_declaration_list opt_subprogram_list
+## LR(1) items:
+block -> opt_variable_declaration_list opt_subprogram_list . statement_part [ PROCEDURE FUNCTION EOF BEGIN ]
+## Transitions:
+-- On BEGIN shift to state 57
+-- On statement_part shift to state 150
+## Reductions:
+
+State 57:
+## Known stack suffix:
+## BEGIN
+## LR(1) items:
+statement_part -> BEGIN . statement_list END DOT [ PROCEDURE FUNCTION EOF BEGIN ]
+## Transitions:
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
+-- On IDE shift to state 4
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement_list shift to state 147
+-- On statement shift to state 135
+-- On ide shift to state 137
+## Reductions:
+
+State 58:
+## Known stack suffix:
+## WRITE
+## LR(1) items:
+statement -> WRITE . LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+## Transitions:
+-- On LP shift to state 59
+## Reductions:
+
+State 59:
+## Known stack suffix:
+## WRITE LP
+## LR(1) items:
+statement -> WRITE LP . loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On separated_nonempty_list(COMMA,exp) shift to state 93
+-- On loption(separated_nonempty_list(COMMA,exp)) shift to state 102
+-- On ide shift to state 66
+-- On exp shift to state 96
+## Reductions:
+-- On RP
+--   reduce production loption(separated_nonempty_list(COMMA,exp)) ->
+
+State 60:
+## Known stack suffix:
+## TRUE
+## LR(1) items:
+exp -> TRUE . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> TRUE
+
+State 61:
+## Known stack suffix:
+## PSTRING
+## LR(1) items:
+exp -> PSTRING . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> PSTRING
+
+State 62:
+## Known stack suffix:
+## NOT
+## LR(1) items:
+exp -> NOT . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 101
+## Reductions:
+
+State 63:
+## Known stack suffix:
+## LP
+## LR(1) items:
+exp -> LP . exp RP [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 99
+## Reductions:
+
+State 64:
+## Known stack suffix:
+## INT
+## LR(1) items:
+exp -> INT . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> INT
+
+State 65:
+## Known stack suffix:
+## FALSE
+## LR(1) items:
+exp -> FALSE . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> FALSE
+
+State 66:
+## Known stack suffix:
+## ide
+## LR(1) items:
+exp -> ide . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide . LS exp RS [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide . LP loption(separated_nonempty_list(COMMA,exp)) RP [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On LS shift to state 67
+-- On LP shift to state 92
+## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> ide
+
+State 67:
+## Known stack suffix:
+## ide LS
+## LR(1) items:
+exp -> ide LS . exp RS [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 68
+## Reductions:
+
+State 68:
+## Known stack suffix:
 ## ide LS exp
 ## LR(1) items:
-exp -> ide LS exp . RS [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide LS exp . RS [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 exp -> exp . PLUS exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 exp -> exp . MINUS exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 exp -> exp . TIMES exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
@@ -640,513 +787,513 @@ exp -> exp . GREATER exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GR
 exp -> exp . AND exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 exp -> exp . OR exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On RS shift to state 58
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On RS shift to state 71
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
-
-State 56:
-## Known stack suffix:
-## exp TIMES
-## LR(1) items:
-exp -> exp TIMES . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 57
-## Reductions:
-
-State 57:
-## Known stack suffix:
-## exp TIMES exp
-## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp TIMES exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
-## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> exp TIMES exp
-
-State 58:
-## Known stack suffix:
-## ide LS exp RS
-## LR(1) items:
-exp -> ide LS exp RS . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
-## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> ide LS exp RS
-
-State 59:
-## Known stack suffix:
-## exp PLUS
-## LR(1) items:
-exp -> exp PLUS . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 60
-## Reductions:
-
-State 60:
-## Known stack suffix:
-## exp PLUS exp
-## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp PLUS exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TIMES shift to state 56
--- On DIVISION shift to state 61
-## Reductions:
--- On TO SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO COMMA AND
---   reduce production exp -> exp PLUS exp
-
-State 61:
-## Known stack suffix:
-## exp DIVISION
-## LR(1) items:
-exp -> exp DIVISION . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 62
-## Reductions:
-
-State 62:
-## Known stack suffix:
-## exp DIVISION exp
-## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp DIVISION exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
-## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
---   reduce production exp -> exp DIVISION exp
-
-State 63:
-## Known stack suffix:
-## exp OR
-## LR(1) items:
-exp -> exp OR . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 64
-## Reductions:
-
-State 64:
-## Known stack suffix:
-## exp OR exp
-## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp OR exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
-## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA
---   reduce production exp -> exp OR exp
-
-State 65:
-## Known stack suffix:
-## exp MINUS
-## LR(1) items:
-exp -> exp MINUS . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 66
-## Reductions:
-
-State 66:
-## Known stack suffix:
-## exp MINUS exp
-## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp MINUS exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TIMES shift to state 56
--- On DIVISION shift to state 61
-## Reductions:
--- On TO SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO COMMA AND
---   reduce production exp -> exp MINUS exp
-
-State 67:
-## Known stack suffix:
-## exp LESSEQUAL
-## LR(1) items:
-exp -> exp LESSEQUAL . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 68
-## Reductions:
-
-State 68:
-## Known stack suffix:
-## exp LESSEQUAL exp
-## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp LESSEQUAL exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On DIVISION shift to state 61
-## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
---   reduce production exp -> exp LESSEQUAL exp
 
 State 69:
 ## Known stack suffix:
-## exp LESS
+## exp TIMES
 ## LR(1) items:
-exp -> exp LESS . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp TIMES . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
+-- On FALSE shift to state 65
+-- On ide shift to state 66
 -- On exp shift to state 70
 ## Reductions:
 
 State 70:
 ## Known stack suffix:
-## exp LESS exp
+## exp TIMES exp
 ## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp LESS exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp TIMES exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On DIVISION shift to state 61
 ## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
---   reduce production exp -> exp LESS exp
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> exp TIMES exp
 
 State 71:
 ## Known stack suffix:
-## exp GREATEREQUAL
+## ide LS exp RS
 ## LR(1) items:
-exp -> exp GREATEREQUAL . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide LS exp RS . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 72
 ## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> ide LS exp RS
 
 State 72:
 ## Known stack suffix:
-## exp GREATEREQUAL exp
+## exp PLUS
 ## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp GREATEREQUAL exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp PLUS . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On DIVISION shift to state 61
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 73
 ## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
---   reduce production exp -> exp GREATEREQUAL exp
 
 State 73:
 ## Known stack suffix:
-## exp GREATER
+## exp PLUS exp
 ## LR(1) items:
-exp -> exp GREATER . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp PLUS exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 74
+-- On TIMES shift to state 69
+-- On DIVISION shift to state 74
 ## Reductions:
+-- On TO THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO COMMA AND
+--   reduce production exp -> exp PLUS exp
 
 State 74:
 ## Known stack suffix:
-## exp GREATER exp
+## exp DIVISION
 ## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp GREATER exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp DIVISION . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On DIVISION shift to state 61
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 75
 ## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
---   reduce production exp -> exp GREATER exp
 
 State 75:
 ## Known stack suffix:
-## exp EQUAL
+## exp DIVISION exp
 ## LR(1) items:
-exp -> exp EQUAL . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp DIVISION exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 76
 ## Reductions:
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+--   reduce production exp -> exp DIVISION exp
 
 State 76:
 ## Known stack suffix:
-## exp EQUAL exp
+## exp OR
 ## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp EQUAL exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp OR . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On DIVISION shift to state 61
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 77
 ## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
---   reduce production exp -> exp EQUAL exp
 
 State 77:
 ## Known stack suffix:
-## exp AND
+## exp OR exp
 ## LR(1) items:
-exp -> exp AND . exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp OR exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
--- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 78
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA
+--   reduce production exp -> exp OR exp
 
 State 78:
 ## Known stack suffix:
-## exp AND exp
+## exp MINUS
 ## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp AND exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp MINUS . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 79
 ## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
---   reduce production exp -> exp AND exp
 
 State 79:
 ## Known stack suffix:
+## exp MINUS exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp MINUS exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO COMMA AND
+--   reduce production exp -> exp MINUS exp
+
+State 80:
+## Known stack suffix:
+## exp LESSEQUAL
+## LR(1) items:
+exp -> exp LESSEQUAL . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 81
+## Reductions:
+
+State 81:
+## Known stack suffix:
+## exp LESSEQUAL exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp LESSEQUAL exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
+--   reduce production exp -> exp LESSEQUAL exp
+
+State 82:
+## Known stack suffix:
+## exp LESS
+## LR(1) items:
+exp -> exp LESS . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 83
+## Reductions:
+
+State 83:
+## Known stack suffix:
+## exp LESS exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp LESS exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
+--   reduce production exp -> exp LESS exp
+
+State 84:
+## Known stack suffix:
+## exp GREATEREQUAL
+## LR(1) items:
+exp -> exp GREATEREQUAL . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 85
+## Reductions:
+
+State 85:
+## Known stack suffix:
+## exp GREATEREQUAL exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp GREATEREQUAL exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
+--   reduce production exp -> exp GREATEREQUAL exp
+
+State 86:
+## Known stack suffix:
+## exp GREATER
+## LR(1) items:
+exp -> exp GREATER . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 87
+## Reductions:
+
+State 87:
+## Known stack suffix:
+## exp GREATER exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp GREATER exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
+--   reduce production exp -> exp GREATER exp
+
+State 88:
+## Known stack suffix:
+## exp EQUAL
+## LR(1) items:
+exp -> exp EQUAL . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 89
+## Reductions:
+
+State 89:
+## Known stack suffix:
+## exp EQUAL exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp EQUAL exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
+--   reduce production exp -> exp EQUAL exp
+
+State 90:
+## Known stack suffix:
+## exp AND
+## LR(1) items:
+exp -> exp AND . exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
+-- On IDE shift to state 4
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 91
+## Reductions:
+
+State 91:
+## Known stack suffix:
+## exp AND exp
+## LR(1) items:
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp AND exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+## Transitions:
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+## Reductions:
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
+--   reduce production exp -> exp AND exp
+
+State 92:
+## Known stack suffix:
 ## ide LP
 ## LR(1) items:
-exp -> ide LP . loption(separated_nonempty_list(COMMA,exp)) RP [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide LP . loption(separated_nonempty_list(COMMA,exp)) RP [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On separated_nonempty_list(COMMA,exp) shift to state 80
--- On loption(separated_nonempty_list(COMMA,exp)) shift to state 81
--- On ide shift to state 53
--- On exp shift to state 83
+-- On FALSE shift to state 65
+-- On separated_nonempty_list(COMMA,exp) shift to state 93
+-- On loption(separated_nonempty_list(COMMA,exp)) shift to state 94
+-- On ide shift to state 66
+-- On exp shift to state 96
 ## Reductions:
 -- On RP
 --   reduce production loption(separated_nonempty_list(COMMA,exp)) ->
 
-State 80:
+State 93:
 ## Known stack suffix:
 ## separated_nonempty_list(COMMA,exp)
 ## LR(1) items:
@@ -1156,26 +1303,26 @@ loption(separated_nonempty_list(COMMA,exp)) -> separated_nonempty_list(COMMA,exp
 -- On RP
 --   reduce production loption(separated_nonempty_list(COMMA,exp)) -> separated_nonempty_list(COMMA,exp)
 
-State 81:
+State 94:
 ## Known stack suffix:
 ## ide LP loption(separated_nonempty_list(COMMA,exp))
 ## LR(1) items:
-exp -> ide LP loption(separated_nonempty_list(COMMA,exp)) . RP [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide LP loption(separated_nonempty_list(COMMA,exp)) . RP [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On RP shift to state 82
+-- On RP shift to state 95
 ## Reductions:
 
-State 82:
+State 95:
 ## Known stack suffix:
 ## ide LP loption(separated_nonempty_list(COMMA,exp)) RP
 ## LR(1) items:
-exp -> ide LP loption(separated_nonempty_list(COMMA,exp)) RP . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> ide LP loption(separated_nonempty_list(COMMA,exp)) RP . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
 --   reduce production exp -> ide LP loption(separated_nonempty_list(COMMA,exp)) RP
 
-State 83:
+State 96:
 ## Known stack suffix:
 ## exp
 ## LR(1) items:
@@ -1193,41 +1340,41 @@ exp -> exp . OR exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER
 separated_nonempty_list(COMMA,exp) -> exp . [ RP ]
 separated_nonempty_list(COMMA,exp) -> exp . COMMA separated_nonempty_list(COMMA,exp) [ RP ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On COMMA shift to state 84
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On COMMA shift to state 97
+-- On AND shift to state 90
 ## Reductions:
 -- On RP
 --   reduce production separated_nonempty_list(COMMA,exp) -> exp
 
-State 84:
+State 97:
 ## Known stack suffix:
 ## exp COMMA
 ## LR(1) items:
 separated_nonempty_list(COMMA,exp) -> exp COMMA . separated_nonempty_list(COMMA,exp) [ RP ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On separated_nonempty_list(COMMA,exp) shift to state 85
--- On ide shift to state 53
--- On exp shift to state 83
+-- On FALSE shift to state 65
+-- On separated_nonempty_list(COMMA,exp) shift to state 98
+-- On ide shift to state 66
+-- On exp shift to state 96
 ## Reductions:
 
-State 85:
+State 98:
 ## Known stack suffix:
 ## exp COMMA separated_nonempty_list(COMMA,exp)
 ## LR(1) items:
@@ -1237,7 +1384,7 @@ separated_nonempty_list(COMMA,exp) -> exp COMMA separated_nonempty_list(COMMA,ex
 -- On RP
 --   reduce production separated_nonempty_list(COMMA,exp) -> exp COMMA separated_nonempty_list(COMMA,exp)
 
-State 86:
+State 99:
 ## Known stack suffix:
 ## LP exp
 ## LR(1) items:
@@ -1252,81 +1399,81 @@ exp -> exp . GREATEREQUAL exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQU
 exp -> exp . GREATER exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 exp -> exp . AND exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 exp -> exp . OR exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> LP exp . RP [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> LP exp . RP [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On RP shift to state 87
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On RP shift to state 100
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 87:
+State 100:
 ## Known stack suffix:
 ## LP exp RP
 ## LR(1) items:
-exp -> LP exp RP . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> LP exp RP . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
 ## Reductions:
--- On TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
+-- On TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND
 --   reduce production exp -> LP exp RP
 
-State 88:
+State 101:
 ## Known stack suffix:
 ## NOT exp
 ## LR(1) items:
-exp -> exp . PLUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . MINUS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . TIMES exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . DIVISION exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . EQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESSEQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . LESS exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATEREQUAL exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . GREATER exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> NOT exp . [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . AND exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
-exp -> exp . OR exp [ TO TIMES SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . PLUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . MINUS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . TIMES exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . DIVISION exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . EQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESSEQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . LESS exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATEREQUAL exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . GREATER exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> NOT exp . [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . AND exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
+exp -> exp . OR exp [ TO TIMES THEN SEMICOLON RS RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION COMMA AND ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
 ## Reductions:
--- On TO SEMICOLON RS RP OR DO COMMA AND
+-- On TO THEN SEMICOLON RS RP OR DO COMMA AND
 --   reduce production exp -> NOT exp
 
-State 89:
+State 102:
 ## Known stack suffix:
 ## WRITE LP loption(separated_nonempty_list(COMMA,exp))
 ## LR(1) items:
 statement -> WRITE LP loption(separated_nonempty_list(COMMA,exp)) . RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On RP shift to state 90
+-- On RP shift to state 103
 ## Reductions:
 
-State 90:
+State 103:
 ## Known stack suffix:
 ## WRITE LP loption(separated_nonempty_list(COMMA,exp)) RP
 ## LR(1) items:
 statement -> WRITE LP loption(separated_nonempty_list(COMMA,exp)) RP . SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On SEMICOLON shift to state 91
+-- On SEMICOLON shift to state 104
 ## Reductions:
 
-State 91:
+State 104:
 ## Known stack suffix:
 ## WRITE LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON
 ## LR(1) items:
@@ -1336,24 +1483,24 @@ statement -> WRITE LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON .
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> WRITE LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON
 
-State 92:
+State 105:
 ## Known stack suffix:
 ## WHILE
 ## LR(1) items:
 statement -> WHILE . exp DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 93
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 106
 ## Reductions:
 
-State 93:
+State 106:
 ## Known stack suffix:
 ## WHILE exp
 ## LR(1) items:
@@ -1370,77 +1517,77 @@ exp -> exp . AND exp [ TIMES PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER E
 exp -> exp . OR exp [ TIMES PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION AND ]
 statement -> WHILE exp . DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DO shift to state 94
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DO shift to state 107
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 94:
+State 107:
 ## Known stack suffix:
 ## WHILE exp DO
 ## LR(1) items:
 statement -> WHILE exp DO . statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement shift to state 135
--- On ide shift to state 126
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement shift to state 146
+-- On ide shift to state 137
 ## Reductions:
 
-State 95:
+State 108:
 ## Known stack suffix:
 ## READ
 ## LR(1) items:
 statement -> READ . LP variable RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On LP shift to state 96
+-- On LP shift to state 109
 ## Reductions:
 
-State 96:
+State 109:
 ## Known stack suffix:
 ## READ LP
 ## LR(1) items:
 statement -> READ LP . variable RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
 -- On IDE shift to state 4
--- On variable shift to state 97
--- On ide shift to state 100
+-- On variable shift to state 110
+-- On ide shift to state 113
 ## Reductions:
 
-State 97:
+State 110:
 ## Known stack suffix:
 ## READ LP variable
 ## LR(1) items:
 statement -> READ LP variable . RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On RP shift to state 98
+-- On RP shift to state 111
 ## Reductions:
 
-State 98:
+State 111:
 ## Known stack suffix:
 ## READ LP variable RP
 ## LR(1) items:
 statement -> READ LP variable RP . SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On SEMICOLON shift to state 99
+-- On SEMICOLON shift to state 112
 ## Reductions:
 
-State 99:
+State 112:
 ## Known stack suffix:
 ## READ LP variable RP SEMICOLON
 ## LR(1) items:
@@ -1450,36 +1597,36 @@ statement -> READ LP variable RP SEMICOLON . [ WRITE WHILE READ IF IDE FOR END E
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> READ LP variable RP SEMICOLON
 
-State 100:
+State 113:
 ## Known stack suffix:
 ## ide
 ## LR(1) items:
 variable -> ide . LS exp RS [ RP ]
 variable -> ide . [ RP ]
 ## Transitions:
--- On LS shift to state 101
+-- On LS shift to state 114
 ## Reductions:
 -- On RP
 --   reduce production variable -> ide
 
-State 101:
+State 114:
 ## Known stack suffix:
 ## ide LS
 ## LR(1) items:
 variable -> ide LS . exp RS [ RP ASSIGN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 102
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 115
 ## Reductions:
 
-State 102:
+State 115:
 ## Known stack suffix:
 ## ide LS exp
 ## LR(1) items:
@@ -1496,21 +1643,21 @@ exp -> exp . AND exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATE
 exp -> exp . OR exp [ TIMES RS PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 variable -> ide LS exp . RS [ RP ASSIGN ]
 ## Transitions:
--- On TIMES shift to state 56
--- On RS shift to state 103
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On RS shift to state 116
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 103:
+State 116:
 ## Known stack suffix:
 ## ide LS exp RS
 ## LR(1) items:
@@ -1520,132 +1667,112 @@ variable -> ide LS exp RS . [ RP ASSIGN ]
 -- On RP ASSIGN
 --   reduce production variable -> ide LS exp RS
 
-State 104:
+State 117:
 ## Known stack suffix:
 ## IF
 ## LR(1) items:
-statement -> IF . LP exp RP THEN statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-statement -> IF . LP exp RP THEN statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF . exp THEN statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF . exp THEN statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On LP shift to state 105
-## Reductions:
-
-State 105:
-## Known stack suffix:
-## IF LP
-## LR(1) items:
-statement -> IF LP . exp RP THEN statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-statement -> IF LP . exp RP THEN statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 106
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 118
 ## Reductions:
 
-State 106:
+State 118:
 ## Known stack suffix:
-## IF LP exp
+## IF exp
 ## LR(1) items:
-exp -> exp . PLUS exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . MINUS exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . TIMES exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . DIVISION exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . EQUAL exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . LESSEQUAL exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . LESS exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . GREATEREQUAL exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . GREATER exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . AND exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-exp -> exp . OR exp [ TIMES RP PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
-statement -> IF LP exp . RP THEN statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-statement -> IF LP exp . RP THEN statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+exp -> exp . PLUS exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . MINUS exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . TIMES exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . DIVISION exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . EQUAL exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . LESSEQUAL exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . LESS exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . GREATEREQUAL exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . GREATER exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . AND exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+exp -> exp . OR exp [ TIMES THEN PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
+statement -> IF exp . THEN statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp . THEN statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TIMES shift to state 56
--- On RP shift to state 107
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On THEN shift to state 119
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 107:
+State 119:
 ## Known stack suffix:
-## IF LP exp RP
+## IF exp THEN
 ## LR(1) items:
-statement -> IF LP exp RP . THEN statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-statement -> IF LP exp RP . THEN statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp THEN . statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp THEN . statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On THEN shift to state 108
-## Reductions:
-
-State 108:
-## Known stack suffix:
-## IF LP exp RP THEN
-## LR(1) items:
-statement -> IF LP exp RP THEN . statement ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-statement -> IF LP exp RP THEN . statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement shift to state 132
--- On ide shift to state 126
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement shift to state 143
+-- On ide shift to state 137
 ## Reductions:
 
-State 109:
+State 120:
 ## Known stack suffix:
 ## FOR
 ## LR(1) items:
 statement -> FOR . ide ASSIGN exp TO exp DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
 -- On IDE shift to state 4
--- On ide shift to state 110
+-- On ide shift to state 121
 ## Reductions:
 
-State 110:
+State 121:
 ## Known stack suffix:
 ## FOR ide
 ## LR(1) items:
 statement -> FOR ide . ASSIGN exp TO exp DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On ASSIGN shift to state 111
+-- On ASSIGN shift to state 122
 ## Reductions:
 
-State 111:
+State 122:
 ## Known stack suffix:
 ## FOR ide ASSIGN
 ## LR(1) items:
 statement -> FOR ide ASSIGN . exp TO exp DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 112
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 123
 ## Reductions:
 
-State 112:
+State 123:
 ## Known stack suffix:
 ## FOR ide ASSIGN exp
 ## LR(1) items:
@@ -1662,38 +1789,38 @@ exp -> exp . AND exp [ TO TIMES PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATE
 exp -> exp . OR exp [ TO TIMES PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 statement -> FOR ide ASSIGN exp . TO exp DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TO shift to state 113
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TO shift to state 124
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 113:
+State 124:
 ## Known stack suffix:
 ## FOR ide ASSIGN exp TO
 ## LR(1) items:
 statement -> FOR ide ASSIGN exp TO . exp DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 114
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 125
 ## Reductions:
 
-State 114:
+State 125:
 ## Known stack suffix:
 ## FOR ide ASSIGN exp TO exp
 ## LR(1) items:
@@ -1710,84 +1837,84 @@ exp -> exp . AND exp [ TIMES PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER E
 exp -> exp . OR exp [ TIMES PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DO DIVISION AND ]
 statement -> FOR ide ASSIGN exp TO exp . DO statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TIMES shift to state 56
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DO shift to state 115
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DO shift to state 126
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 115:
+State 126:
 ## Known stack suffix:
 ## FOR ide ASSIGN exp TO exp DO
 ## LR(1) items:
 statement -> FOR ide ASSIGN exp TO exp DO . statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement shift to state 131
--- On ide shift to state 126
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement shift to state 142
+-- On ide shift to state 137
 ## Reductions:
 
-State 116:
+State 127:
 ## Known stack suffix:
 ## BEGIN
 ## LR(1) items:
 statement -> BEGIN . statement_list END SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement_list shift to state 121
--- On statement shift to state 124
--- On ide shift to state 126
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement_list shift to state 132
+-- On statement shift to state 135
+-- On ide shift to state 137
 ## Reductions:
 
-State 117:
+State 128:
 ## Known stack suffix:
 ## variable
 ## LR(1) items:
 statement -> variable . ASSIGN exp SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On ASSIGN shift to state 118
+-- On ASSIGN shift to state 129
 ## Reductions:
 
-State 118:
+State 129:
 ## Known stack suffix:
 ## variable ASSIGN
 ## LR(1) items:
 statement -> variable ASSIGN . exp SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On ide shift to state 53
--- On exp shift to state 119
+-- On FALSE shift to state 65
+-- On ide shift to state 66
+-- On exp shift to state 130
 ## Reductions:
 
-State 119:
+State 130:
 ## Known stack suffix:
 ## variable ASSIGN exp
 ## LR(1) items:
@@ -1804,21 +1931,21 @@ exp -> exp . AND exp [ TIMES SEMICOLON PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL
 exp -> exp . OR exp [ TIMES SEMICOLON PLUS OR MINUS LESSEQUAL LESS GREATEREQUAL GREATER EQUAL DIVISION AND ]
 statement -> variable ASSIGN exp . SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TIMES shift to state 56
--- On SEMICOLON shift to state 120
--- On PLUS shift to state 59
--- On OR shift to state 63
--- On MINUS shift to state 65
--- On LESSEQUAL shift to state 67
--- On LESS shift to state 69
--- On GREATEREQUAL shift to state 71
--- On GREATER shift to state 73
--- On EQUAL shift to state 75
--- On DIVISION shift to state 61
--- On AND shift to state 77
+-- On TIMES shift to state 69
+-- On SEMICOLON shift to state 131
+-- On PLUS shift to state 72
+-- On OR shift to state 76
+-- On MINUS shift to state 78
+-- On LESSEQUAL shift to state 80
+-- On LESS shift to state 82
+-- On GREATEREQUAL shift to state 84
+-- On GREATER shift to state 86
+-- On EQUAL shift to state 88
+-- On DIVISION shift to state 74
+-- On AND shift to state 90
 ## Reductions:
 
-State 120:
+State 131:
 ## Known stack suffix:
 ## variable ASSIGN exp SEMICOLON
 ## LR(1) items:
@@ -1828,25 +1955,25 @@ statement -> variable ASSIGN exp SEMICOLON . [ WRITE WHILE READ IF IDE FOR END E
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> variable ASSIGN exp SEMICOLON
 
-State 121:
+State 132:
 ## Known stack suffix:
 ## BEGIN statement_list
 ## LR(1) items:
 statement -> BEGIN statement_list . END SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On END shift to state 122
+-- On END shift to state 133
 ## Reductions:
 
-State 122:
+State 133:
 ## Known stack suffix:
 ## BEGIN statement_list END
 ## LR(1) items:
 statement -> BEGIN statement_list END . SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On SEMICOLON shift to state 123
+-- On SEMICOLON shift to state 134
 ## Reductions:
 
-State 123:
+State 134:
 ## Known stack suffix:
 ## BEGIN statement_list END SEMICOLON
 ## LR(1) items:
@@ -1856,29 +1983,29 @@ statement -> BEGIN statement_list END SEMICOLON . [ WRITE WHILE READ IF IDE FOR 
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> BEGIN statement_list END SEMICOLON
 
-State 124:
+State 135:
 ## Known stack suffix:
 ## statement
 ## LR(1) items:
 statement_list -> statement . [ END ]
 statement_list -> statement . statement_list [ END ]
 ## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement_list shift to state 125
--- On statement shift to state 124
--- On ide shift to state 126
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement_list shift to state 136
+-- On statement shift to state 135
+-- On ide shift to state 137
 ## Reductions:
 -- On END
 --   reduce production statement_list -> statement
 
-State 125:
+State 136:
 ## Known stack suffix:
 ## statement statement_list
 ## LR(1) items:
@@ -1888,7 +2015,7 @@ statement_list -> statement statement_list . [ END ]
 -- On END
 --   reduce production statement_list -> statement statement_list
 
-State 126:
+State 137:
 ## Known stack suffix:
 ## ide
 ## LR(1) items:
@@ -1896,52 +2023,52 @@ statement -> ide . LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON [
 variable -> ide . LS exp RS [ ASSIGN ]
 variable -> ide . [ ASSIGN ]
 ## Transitions:
--- On LS shift to state 101
--- On LP shift to state 127
+-- On LS shift to state 114
+-- On LP shift to state 138
 ## Reductions:
 -- On ASSIGN
 --   reduce production variable -> ide
 
-State 127:
+State 138:
 ## Known stack suffix:
 ## ide LP
 ## LR(1) items:
 statement -> ide LP . loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On TRUE shift to state 47
--- On PSTRING shift to state 48
--- On NOT shift to state 49
--- On LP shift to state 50
--- On INT shift to state 51
+-- On TRUE shift to state 60
+-- On PSTRING shift to state 61
+-- On NOT shift to state 62
+-- On LP shift to state 63
+-- On INT shift to state 64
 -- On IDE shift to state 4
--- On FALSE shift to state 52
--- On separated_nonempty_list(COMMA,exp) shift to state 80
--- On loption(separated_nonempty_list(COMMA,exp)) shift to state 128
--- On ide shift to state 53
--- On exp shift to state 83
+-- On FALSE shift to state 65
+-- On separated_nonempty_list(COMMA,exp) shift to state 93
+-- On loption(separated_nonempty_list(COMMA,exp)) shift to state 139
+-- On ide shift to state 66
+-- On exp shift to state 96
 ## Reductions:
 -- On RP
 --   reduce production loption(separated_nonempty_list(COMMA,exp)) ->
 
-State 128:
+State 139:
 ## Known stack suffix:
 ## ide LP loption(separated_nonempty_list(COMMA,exp))
 ## LR(1) items:
 statement -> ide LP loption(separated_nonempty_list(COMMA,exp)) . RP SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On RP shift to state 129
+-- On RP shift to state 140
 ## Reductions:
 
-State 129:
+State 140:
 ## Known stack suffix:
 ## ide LP loption(separated_nonempty_list(COMMA,exp)) RP
 ## LR(1) items:
 statement -> ide LP loption(separated_nonempty_list(COMMA,exp)) RP . SEMICOLON [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On SEMICOLON shift to state 130
+-- On SEMICOLON shift to state 141
 ## Reductions:
 
-State 130:
+State 141:
 ## Known stack suffix:
 ## ide LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON
 ## LR(1) items:
@@ -1951,7 +2078,7 @@ statement -> ide LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON . [
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> ide LP loption(separated_nonempty_list(COMMA,exp)) RP SEMICOLON
 
-State 131:
+State 142:
 ## Known stack suffix:
 ## FOR ide ASSIGN exp TO exp DO statement
 ## LR(1) items:
@@ -1961,47 +2088,47 @@ statement -> FOR ide ASSIGN exp TO exp DO statement . [ WRITE WHILE READ IF IDE 
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> FOR ide ASSIGN exp TO exp DO statement
 
-State 132:
+State 143:
 ## Known stack suffix:
-## IF LP exp RP THEN statement
+## IF exp THEN statement
 ## LR(1) items:
-statement -> IF LP exp RP THEN statement . ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
-statement -> IF LP exp RP THEN statement . [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp THEN statement . ELSE statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp THEN statement . [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On ELSE shift to state 133
+-- On ELSE shift to state 144
 ## Reductions:
 -- On WRITE WHILE READ IF IDE FOR END BEGIN
---   reduce production statement -> IF LP exp RP THEN statement
+--   reduce production statement -> IF exp THEN statement
 
-State 133:
+State 144:
 ## Known stack suffix:
-## IF LP exp RP THEN statement ELSE
+## IF exp THEN statement ELSE
 ## LR(1) items:
-statement -> IF LP exp RP THEN statement ELSE . statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp THEN statement ELSE . statement [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
--- On WRITE shift to state 45
--- On WHILE shift to state 92
--- On READ shift to state 95
--- On IF shift to state 104
+-- On WRITE shift to state 58
+-- On WHILE shift to state 105
+-- On READ shift to state 108
+-- On IF shift to state 117
 -- On IDE shift to state 4
--- On FOR shift to state 109
--- On BEGIN shift to state 116
--- On variable shift to state 117
--- On statement shift to state 134
--- On ide shift to state 126
+-- On FOR shift to state 120
+-- On BEGIN shift to state 127
+-- On variable shift to state 128
+-- On statement shift to state 145
+-- On ide shift to state 137
 ## Reductions:
 
-State 134:
+State 145:
 ## Known stack suffix:
-## IF LP exp RP THEN statement ELSE statement
+## IF exp THEN statement ELSE statement
 ## LR(1) items:
-statement -> IF LP exp RP THEN statement ELSE statement . [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
+statement -> IF exp THEN statement ELSE statement . [ WRITE WHILE READ IF IDE FOR END ELSE BEGIN ]
 ## Transitions:
 ## Reductions:
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
---   reduce production statement -> IF LP exp RP THEN statement ELSE statement
+--   reduce production statement -> IF exp THEN statement ELSE statement
 
-State 135:
+State 146:
 ## Known stack suffix:
 ## WHILE exp DO statement
 ## LR(1) items:
@@ -2011,25 +2138,25 @@ statement -> WHILE exp DO statement . [ WRITE WHILE READ IF IDE FOR END ELSE BEG
 -- On WRITE WHILE READ IF IDE FOR END ELSE BEGIN
 --   reduce production statement -> WHILE exp DO statement
 
-State 136:
+State 147:
 ## Known stack suffix:
 ## BEGIN statement_list
 ## LR(1) items:
 statement_part -> BEGIN statement_list . END DOT [ PROCEDURE FUNCTION EOF BEGIN ]
 ## Transitions:
--- On END shift to state 137
+-- On END shift to state 148
 ## Reductions:
 
-State 137:
+State 148:
 ## Known stack suffix:
 ## BEGIN statement_list END
 ## LR(1) items:
 statement_part -> BEGIN statement_list END . DOT [ PROCEDURE FUNCTION EOF BEGIN ]
 ## Transitions:
--- On DOT shift to state 138
+-- On DOT shift to state 149
 ## Reductions:
 
-State 138:
+State 149:
 ## Known stack suffix:
 ## BEGIN statement_list END DOT
 ## LR(1) items:
@@ -2039,190 +2166,36 @@ statement_part -> BEGIN statement_list END DOT . [ PROCEDURE FUNCTION EOF BEGIN 
 -- On PROCEDURE FUNCTION EOF BEGIN
 --   reduce production statement_part -> BEGIN statement_list END DOT
 
-State 139:
-## Known stack suffix:
-## PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list statement_part
-## LR(1) items:
-subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list statement_part . [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
-## Reductions:
--- On PROCEDURE FUNCTION BEGIN
---   reduce production subprogram -> PROCEDURE ide LP loption(separated_nonempty_list(COMMA,parameter)) RP SEMICOLON opt_variable_declaration_list statement_part
-
-State 140:
-## Known stack suffix:
-## FUNCTION
-## LR(1) items:
-subprogram -> FUNCTION . ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On IDE shift to state 4
--- On ide shift to state 141
-## Reductions:
-
-State 141:
-## Known stack suffix:
-## FUNCTION ide
-## LR(1) items:
-subprogram -> FUNCTION ide . LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On LP shift to state 142
-## Reductions:
-
-State 142:
-## Known stack suffix:
-## FUNCTION ide LP
-## LR(1) items:
-subprogram -> FUNCTION ide LP . loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On IDE shift to state 4
--- On separated_nonempty_list(COMMA,parameter) shift to state 33
--- On separated_nonempty_list(COMMA,ide) shift to state 34
--- On parameter shift to state 37
--- On loption(separated_nonempty_list(COMMA,parameter)) shift to state 143
--- On ide shift to state 25
-## Reductions:
--- On RP
---   reduce production loption(separated_nonempty_list(COMMA,parameter)) ->
-
-State 143:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter))
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) . RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On RP shift to state 144
-## Reductions:
-
-State 144:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP . COLON ptype SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On COLON shift to state 145
-## Reductions:
-
-State 145:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON . ptype SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On TSTRING shift to state 9
--- On TINT shift to state 10
--- On TCHAR shift to state 11
--- On TBOOLEAN shift to state 12
--- On ARRAY shift to state 13
--- On stype shift to state 22
--- On ptype shift to state 146
-## Reductions:
-
-State 146:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype . SEMICOLON opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On SEMICOLON shift to state 147
-## Reductions:
-
-State 147:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON . opt_variable_declaration_list statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On VAR shift to state 3
--- On opt_variable_declaration_list shift to state 148
-## Reductions:
--- On BEGIN
---   reduce production opt_variable_declaration_list ->
-
-State 148:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list . statement_part [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
--- On BEGIN shift to state 44
--- On statement_part shift to state 149
-## Reductions:
-
-State 149:
-## Known stack suffix:
-## FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part
-## LR(1) items:
-subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part . [ PROCEDURE FUNCTION BEGIN ]
-## Transitions:
-## Reductions:
--- On PROCEDURE FUNCTION BEGIN
---   reduce production subprogram -> FUNCTION ide LP loption(separated_nonempty_list(COMMA,parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part
-
 State 150:
 ## Known stack suffix:
-## subprogram_list
+## opt_variable_declaration_list opt_subprogram_list statement_part
 ## LR(1) items:
-opt_subprogram_list -> subprogram_list . [ BEGIN ]
+block -> opt_variable_declaration_list opt_subprogram_list statement_part . [ PROCEDURE FUNCTION EOF BEGIN ]
 ## Transitions:
 ## Reductions:
--- On BEGIN
---   reduce production opt_subprogram_list -> subprogram_list
+-- On PROCEDURE FUNCTION EOF BEGIN
+--   reduce production block -> opt_variable_declaration_list opt_subprogram_list statement_part
 
 State 151:
 ## Known stack suffix:
-## subprogram
+## PROGRAM PSTRING block
 ## LR(1) items:
-subprogram_list -> subprogram . [ BEGIN ]
-subprogram_list -> subprogram . subprogram_list [ BEGIN ]
+program -> PROGRAM PSTRING block . EOF [ # ]
 ## Transitions:
--- On PROCEDURE shift to state 30
--- On FUNCTION shift to state 140
--- On subprogram_list shift to state 152
--- On subprogram shift to state 151
+-- On EOF shift to state 152
 ## Reductions:
--- On BEGIN
---   reduce production subprogram_list -> subprogram
 
 State 152:
 ## Known stack suffix:
-## subprogram subprogram_list
+## PROGRAM PSTRING block EOF
 ## LR(1) items:
-subprogram_list -> subprogram subprogram_list . [ BEGIN ]
-## Transitions:
-## Reductions:
--- On BEGIN
---   reduce production subprogram_list -> subprogram subprogram_list
-
-State 153:
-## Known stack suffix:
-## PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list
-## LR(1) items:
-program -> PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list . statement_part EOF [ # ]
-## Transitions:
--- On BEGIN shift to state 44
--- On statement_part shift to state 154
-## Reductions:
-
-State 154:
-## Known stack suffix:
-## PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part
-## LR(1) items:
-program -> PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part . EOF [ # ]
-## Transitions:
--- On EOF shift to state 155
-## Reductions:
-
-State 155:
-## Known stack suffix:
-## PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF
-## LR(1) items:
-program -> PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF . [ # ]
+program -> PROGRAM PSTRING block EOF . [ # ]
 ## Transitions:
 ## Reductions:
 -- On #
---   reduce production program -> PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF
+--   reduce production program -> PROGRAM PSTRING block EOF
 
-State 156:
+State 153:
 ## Known stack suffix:
 ## program
 ## LR(1) items:

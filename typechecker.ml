@@ -86,9 +86,9 @@ let rec add_vars_to_map varlist varmap =
 
 let rec add_function_returns_to_map subprogram_list varmap =
   match subprogram_list with
-  | FunctionDeclaration (i, _, _, _, rtrn) :: tl ->
+  | FunctionDeclaration (i, _, _, rtrn) :: tl ->
       add_function_returns_to_map tl (VariableMap.add i rtrn varmap)
-  | ProcedureDeclaration (i, _, _, _) :: tl ->
+  | ProcedureDeclaration (i, _, _) :: tl ->
       add_function_returns_to_map tl
         (VariableMap.add i (SimpleType TypeNull) varmap)
   | [] -> varmap
@@ -116,9 +116,9 @@ let are_parameters_expected funname paramlist explist =
 
 let rec functions_to_parameters_map funlist paramsmap =
   match funlist with
-  | ProcedureDeclaration (i, params, _, _s) :: tl ->
+  | ProcedureDeclaration (i, params, _s) :: tl ->
       functions_to_parameters_map tl (ParameterMap.add i params paramsmap)
-  | FunctionDeclaration (i, params, _, _, _) :: tl ->
+  | FunctionDeclaration (i, params, _, _) :: tl ->
       functions_to_parameters_map tl (ParameterMap.add i params paramsmap)
   | [] -> paramsmap
 
@@ -225,7 +225,34 @@ let rec check_statements statement varmap paramsmap =
       match el with Some a -> check_statements a varmap paramsmap | None -> ())
   (*find a way to get the return value type*)
   (*Compare exp list to argument list types*)
-  | STMTSubprogramCall (_, _) -> ()
+  | STMTSubprogramCall (i, e) -> (
+      let returntype_opt = VariableMap.find_opt i varmap in
+      let returntype =
+        match returntype_opt with
+        | Some a -> a
+        | None -> raise_subprogram_not_declared i
+      in
+      is_type_expected (SimpleType(TypeNull)) [returntype] |> ignore;
+
+          
+
+      let exp_types =
+        List.map (fun x -> check_expression x varmap paramsmap) e
+      in
+
+      let paramslist_opt = ParameterMap.find_opt i paramsmap in
+      let paramslist =
+        match paramslist_opt with
+        | Some a ->
+            List.map
+              (fun x -> match x with VariableDeclaration (_, tp) -> tp)
+              a
+        | None -> raise_subprogram_not_declared i
+      in
+      are_parameters_expected i paramslist exp_types;
+
+
+  )
   | STMTWhile (e, st) ->
       is_type_expected (SimpleType TypeBoolean)
         [ check_expression e varmap paramsmap ]
@@ -255,31 +282,37 @@ let check_subprogram name globalvarsmap paramsmap localparmslist localvarslist
   check_statements statement totalvars paramsmap;
   local_map
 
-let rec check_program my_program =
-  let varlist, sublist, stm =
-    match my_program with Program (_, a, b, c) -> (a, b, c)
-  in
-  let global_map =
-    add_vars_to_map varlist VariableMap.empty
-    |> add_function_returns_to_map sublist
-  in
-  let params_map = functions_to_parameters_map sublist ParameterMap.empty in
-  (*Main function*)
-  check_subprogram "main" global_map params_map [] [] stm (SimpleType TypeNull)|> ignore;
-  let subprogram_vars =
-    List.map
-      (fun x ->
-        match x with
-        | ProcedureDeclaration (name, prms, lclvrs, stmt) ->
-            check_subprogram name global_map params_map prms lclvrs stmt (SimpleType TypeNull)
-        | FunctionDeclaration (name, prms, lclvrs, stmt, t) ->
-            check_subprogram name global_map params_map prms lclvrs stmt t)
-      sublist
-  in
-
-  global_map :: subprogram_vars
 
 (*
+    parentvars: current scope of the parent
+    parentparams: current function scope of the parents (including their params list)
 
-let rec check_subprogram subprogram map =
-    *)
+ *)
+let rec read_subprogram subprogram parentvars parentparams =
+  let name, params, block, returntype = 
+        match subprogram with
+        | ProcedureDeclaration (name, prms, block) -> name, prms, block, (SimpleType TypeNull)
+        | FunctionDeclaration (name, prms, block, t) -> name, prms, block, t
+  in
+  let varlist, sublist, stm =
+    match block with Block (a, b, c) -> (a, b, c)
+  in
+  
+  let localvars =
+    add_vars_to_map varlist parentvars
+    |> add_vars_to_map params
+    |> add_function_returns_to_map sublist
+  in
+  let localparams =
+    functions_to_parameters_map sublist parentparams in
+
+  check_statements stm localvars localparams;
+  List.iter (fun x -> read_subprogram x localvars localparams) sublist
+
+
+let type_check_program my_program= 
+    let _, main_block = (match my_program with | Program(a,b) -> (a,b))
+    in 
+    (*Main is a procedure*)
+    read_subprogram (ProcedureDeclaration("main", [], main_block)) (VariableMap.empty) (ParameterMap.empty);
+

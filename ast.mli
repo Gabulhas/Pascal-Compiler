@@ -3,13 +3,10 @@
 type ident = string
 
 (*PROCEDURE (ident: name) (variable_declaration list: arguments) ....*)
-and program =
-  | Program of
-      string
-      * variable_declaration list
-      * subprogram_declaration list
-      * statement
+and program = Program of string * block
 
+and block =
+  | Block of variable_declaration list * subprogram_declaration list * statement
 (*-------------------Variable declaration part----------------------------------------------*)
 
 (*<variable declaration> ::=	<identifier > { , <identifier> } : <type>*)
@@ -34,14 +31,16 @@ and simpletype =
 
 (* <procedure declaration> ::=	procedure <identifier> ; <block> *)
 and subprogram_declaration =
-  | ProcedureDeclaration of
-      ident * variable_declaration list * variable_declaration list * statement
+  | ProcedureDeclaration of 
+      ident 
+      * variable_declaration list 
+      * block
+
   (* Last value is the return type*)
   | FunctionDeclaration of
-      ident
-      * variable_declaration list
-      * variable_declaration list
-      * statement
+      ident 
+      * variable_declaration list 
+      * block 
       * pascaltype
 (*------------------------------------------------------------------------------------------*)
 

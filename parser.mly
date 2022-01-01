@@ -71,11 +71,14 @@ END.
 (*-------------------Program part-----------------------------------------------------------*)
 (* program <identifier> ; <block> .*)
 program:
-     |PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF { Program($2, $3, $4, $5) }
+     |PROGRAM PSTRING block EOF { Program($2, $3) }
      ;
 
-(*------------------------------------------------------------------------------------------*)
+block: 
+    | opt_variable_declaration_list opt_subprogram_list statement_part {Block($1, $2, $3)}
+    ;
 
+(*------------------------------------------------------------------------------------------*)
 (*-------------------Variable declaration part----------------------------------------------*)
 opt_variable_declaration_list: 
     |                                             { [] }
@@ -102,8 +105,8 @@ statement:
     | variable ASSIGN exp SEMICOLON                       { STMTAss($1,$3) }
     | BEGIN statement_list END SEMICOLON              { STMTBlock($2) }
     | FOR ide ASSIGN exp TO exp DO statement    { STMTFor($2, $4, $6, $8) }
-    | IF LP exp RP THEN statement ELSE statement         { STMTIf($3,$6,Some $8) }
-    | IF LP exp RP THEN statement                        { STMTIf($3,$6,None) }
+    | IF exp THEN statement ELSE statement         { STMTIf($2,$4,Some $6) }
+    | IF exp THEN statement                        { STMTIf($2,$4,None) }
     | ide LP separated_list(COMMA, exp) RP SEMICOLON                    { STMTSubprogramCall($1,$3) }
     | WHILE exp DO statement                       { STMTWhile($2,$4) }
     | WRITE LP separated_list(COMMA, exp) RP SEMICOLON                  { STMTWrite($3) }
@@ -154,10 +157,10 @@ subprogram_list
     ;
 
 subprogram
-    : PROCEDURE ide LP flatten(separated_list(COMMA, parameter)) RP SEMICOLON opt_variable_declaration_list statement_part 
-	                                          { ProcedureDeclaration($2,$4,$7, $8) }
-    | FUNCTION ide LP flatten(separated_list(COMMA, parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part
-	                                          { FunctionDeclaration($2,$4,$9,$10, $7) }
+    : PROCEDURE ide LP flatten(separated_list(COMMA, parameter)) RP SEMICOLON block 
+	                                          { ProcedureDeclaration($2,$4,$7) }
+    | FUNCTION ide LP flatten(separated_list(COMMA, parameter)) RP COLON ptype SEMICOLON block
+	                                          { FunctionDeclaration($2,$4,$9, $7) }
     ;
 
 parameter:
