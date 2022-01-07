@@ -17,7 +17,7 @@ exception TypeMismatch of string
 exception ParametersMismatch of string
 exception NotAnArray of string
 
-let rec simpletype_to_string = function
+let simpletype_to_string = function
   | TypeInteger -> "Integer"
   | TypeReal -> "Real"
   | TypeBoolean -> "Boolean"
@@ -93,7 +93,7 @@ let rec add_function_returns_to_map subprogram_list varmap =
         (VariableMap.add i (SimpleType TypeNull) varmap)
   | [] -> varmap
 
-let get_sympletype = function SimpleType a -> a | ArrayType (_, _, a) -> a
+let get_simpletype = function SimpleType a -> a | ArrayType (_, _, a) -> a
 
 
 let compare_pascaltypes a b =
@@ -313,6 +313,6 @@ let rec read_subprogram subprogram parentvars parentparams =
 let type_check_program my_program= 
     let _, main_block = (match my_program with | Program(a,b) -> (a,b))
     in 
-    (*Main is a procedure*)
     read_subprogram (ProcedureDeclaration("main", [], main_block)) (VariableMap.empty) (ParameterMap.empty);
+    my_program
 

@@ -1,5 +1,5 @@
 #CMO=lexer.cmo parser.cmo x86_64.cmo compile.cmo main.cmo
-CMO=lexer.cmo parser.cmo typechecker.cmo codegeneration.cmo main.cmo 
+CMO=lexer.cmo parser.cmo typechecker.cmo x86_64.ml codegeneration.cmo main.cmo 
 GENERATED=lexer.ml parser.ml parser.mli
 BIN=pascaml
 FLAGS=-dtypes

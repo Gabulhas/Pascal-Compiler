@@ -1,8 +1,6 @@
 ast.cmi :
-codegeneration.cmo : \
-    ast.cmi
-codegeneration.cmx : \
-    ast.cmi
+codegeneration.cmo :
+codegeneration.cmx :
 compile.cmo :
 compile.cmx :
 lexer.cmo : \

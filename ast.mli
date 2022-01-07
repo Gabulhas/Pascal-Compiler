@@ -31,17 +31,10 @@ and simpletype =
 
 (* <procedure declaration> ::=	procedure <identifier> ; <block> *)
 and subprogram_declaration =
-  | ProcedureDeclaration of 
-      ident 
-      * variable_declaration list 
-      * block
-
+  | ProcedureDeclaration of ident * variable_declaration list * block
   (* Last value is the return type*)
   | FunctionDeclaration of
-      ident 
-      * variable_declaration list 
-      * block 
-      * pascaltype
+      ident * variable_declaration list * block * pascaltype
 (*------------------------------------------------------------------------------------------*)
 
 (*-------------------Statement declaration part---------------------------------------------*)
@@ -82,3 +75,42 @@ and exp =
 (*EntireVar -> batata(a) *)
 (*IndexedVar -> batata(a[1]) *)
 and variable = EntireVar of ident | IndexedVar of ident * exp
+
+(*Compile Statement*)
+type cstatement =
+  | CSTMTAss of variable * exp (*Begin...End*)
+  | CSTMTBlock of statement list
+  | CSTMTFor of ident * exp * exp * statement
+  (*<if statement> ::=	if <expression> then <statement> | if <expression> then <statement> else <statement>  option because it might have an else statement or not *)
+  | CSTMTIf of exp * statement * statement option
+  (*example batata(4, a, 9*2) *)
+  | CSTMTSubprogramCall of ident * exp list
+  | CSTMTWhile of exp * statement
+  | CSTMTRead of variable
+  | CSTMTWrite of exp list
+  | CSTMTEmpty
+
+(*Allocate Expression*)
+and aexp =
+  | ConstInteger of int
+  | ConstString of string
+  | ConstChar of char
+  | ConstB of bool
+  | LVar of aident
+  | GVar of string
+  | ASUM of aexp * aexp
+  | ASUB of aexp * aexp
+  | AMUL of aexp * aexp
+  | ADIV of aexp * aexp
+  | AEqu of aexp * aexp
+  | ALE of aexp * aexp
+  | ALT of aexp * aexp
+  | AGE of aexp * aexp
+  | AGT of aexp * aexp
+  | ANOT of aexp
+  | AAND of aexp * aexp
+  | AOR of aexp * aexp
+  | ACALL of ident * aexp list
+
+
+and aident = int

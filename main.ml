@@ -1,16 +1,9 @@
 let pipeline filename =
-  let lexbuf = Lexing.from_channel (open_in filename) in
-  let ast = Parser.program Lexer.lex lexbuf in
-  Codegeneration.from_ast ast
+  open_in filename
+  |> Lexing.from_channel
+  |> Parser.program Lexer.lex
+  |> Typechecker.type_check_program
+  |> Codegeneration.generation_pipeline
 
-let print_var_list varlist =
-  List.iter
-    (fun ele ->
-      Typechecker.VariableMap.iter
-        (fun k v -> Printf.printf "%s: %s\n" k (Typechecker.type_to_string v))
-        ele;
-      print_newline ())
-    varlist
 
-let load_lex () = Lexing.from_channel stdin
-let generate_ast lexbuf = Parser.program Lexer.lex lexbuf
+
