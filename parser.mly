@@ -130,6 +130,7 @@ exp:
     | ide LS exp RS  {Var(IndexedVar($1,$3 ))}
     | exp PLUS exp {SUM($1,$3)}
     | exp MINUS exp {SUB($1,$3)}
+    | MINUS exp {SUB(Integer(0),$2)}
     | exp TIMES exp {MUL($1,$3)}
     | exp DIVISION exp {DIV($1,$3)}
     | exp EQUAL exp {Equ($1, $3)}

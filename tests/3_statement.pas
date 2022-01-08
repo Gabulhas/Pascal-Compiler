@@ -1,11 +1,21 @@
 program "statement"
 
 var
-    numero  :int; 
-    treta   :int; 
-    ola     :boolean; 
-    primeiro, segundo, terceiro:int;
+    numero  :int;
+    alface  :int;
+    treta   :int;
+    cebola  :int;
 
 begin
     numero:=4;
+    treta := 9;
+    cebola := 3 * 3;
+
+    write(numero - treta);
+    alface := 20;
+    write(numero - treta - cebola);
+
+    write(numero + alface + 5);
+
+
 end.
