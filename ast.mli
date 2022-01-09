@@ -42,7 +42,7 @@ and subprogram_declaration =
 and statement =
   | STMTAss of variable * exp (*Begin...End*)
   | STMTBlock of statement list
-  | STMTFor of ident * exp * exp * statement
+  | STMTFor of ident * exp * exp * statement * bool
   (*<if statement> ::=	if <expression> then <statement> | if <expression> then <statement> else <statement>  option because it might have an else statement or not *)
   | STMTIf of exp * statement * statement option
   (*example batata(4, a, 9*2) *)
@@ -62,6 +62,7 @@ and exp =
   | SUB of exp * exp
   | MUL of exp * exp
   | DIV of exp * exp
+  | MOD of exp * exp
   | Equ of exp * exp
   | LE of exp * exp
   | LT of exp * exp

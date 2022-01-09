@@ -146,6 +146,7 @@ let rec check_expression expression varmap paramsmap =
   | SUB (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
   | MUL (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
   | DIV (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
+  | MOD (a, b) -> check_complex (SimpleType TypeInteger) [ a; b ]
   | Equ (a, b) ->
       check_complex (SimpleType TypeInteger) [ a; b ] |> ignore;
       SimpleType TypeBoolean
@@ -207,7 +208,7 @@ let rec check_statements statement varmap paramsmap =
       is_type_expected a_type [ e_type ] |> ignore
   | STMTBlock stmt_list ->
       List.iter (fun x -> check_statements x varmap paramsmap) stmt_list
-  | STMTFor (a, b, c, d) ->
+  | STMTFor (a, b, c, d, _) ->
       let a_type = get_var_type_from_ident a varmap in
       is_type_expected (SimpleType TypeInteger)
         [

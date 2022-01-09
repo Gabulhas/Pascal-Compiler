@@ -152,7 +152,8 @@ let print_tree tree = Smap.iter print_def tree
 (*Only used for write*)
 
 let exp_type sbtr = function
-  | SUM (_, _) | SUB (_, _) | MUL (_, _) | DIV (_, _) | Integer _ ->
+  | SUM (_, _) | SUB (_, _) | MUL (_, _) | DIV (_, _) | MOD (_, _) | Integer _
+    ->
       SimpleType TypeInteger
   | Equ (_, _)
   | LE (_, _)
@@ -226,6 +227,13 @@ let rec compile_expr sb_tr sb_name e =
         ++ movq (reg rdi) (reg rcx)
         ++ idivq (reg rcx)
         ++ movq (reg rax) (reg rdi))
+  | MOD (a, b) ->
+      binop a b
+        (movq (imm 0) (reg rdx)
+        ++ movq (reg rsi) (reg rax)
+        ++ movq (reg rdi) (reg rcx)
+        ++ idivq (reg rcx)
+        ++ movq (reg rdx) (reg rdi))
   | Equ (a, b) ->
       binop a b
         (cmpq (reg rdi) (reg rsi) ++ sete (reg dil) ++ movzbq (reg dil) rdi)
@@ -304,13 +312,14 @@ let rec compile_stmt sb_tr sb_name = function
       List.fold_left
         (fun accum x -> accum ++ compile_stmt sb_tr sb_name x)
         nop stmt_list
-  | STMTFor (varname, fr, t, stmt) ->
+  | STMTFor (varname, fr, t, stmt, uppwards) ->
       let fake_var = EntireVar varname in
       let fake_initial_assign = STMTAss (fake_var, fr) in
-      let while_condition = LE (Var fake_var, t) in
-      let while_stmt =
-        STMTBlock [ stmt; STMTAss (fake_var, SUM (Var fake_var, Integer 1)) ]
+      let while_condition, inc_or_dec =
+        if uppwards then (LE (Var fake_var, t), SUM (Var fake_var, Integer 1))
+        else (GE (Var fake_var, t), SUB (Var fake_var, Integer 1))
       in
+      let while_stmt = STMTBlock [ stmt; STMTAss (fake_var, inc_or_dec) ] in
       let fake_stmt =
         STMTBlock
           [ fake_initial_assign; STMTWhile (while_condition, while_stmt) ]
@@ -375,7 +384,6 @@ let rec compile_stmt sb_tr sb_name = function
         let lvl = get_level sb_tr sb_name in
         movq (reg rbp) (reg rsi)
         ++ frame_walk (lvl - l) (movq (ind ~ofs:16 rsi) (reg rsi))
-
         ++ pushq (reg rsi)
         ++ call "scan_int" ++ popq rsi
         ++ movq (reg rdi) (ind ~ofs rsi)
