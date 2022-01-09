@@ -1,15 +1,19 @@
 program "statement"
 
 var
-    numero  :int; 
-    treta   :int; 
-    ola     :boolean; 
-    primeiro, segundo, terceiro:int;
+    a  :int; 
+    b   :int; 
+    c :boolean;
 
 begin
-    numero:=4;
-    treta:=5;
-    if(numero > treta) then 
-        numero:=1;
-    end;
+    a:=4;
+    b:=5;
+    c:= false | (false & (a < b));
+    if a > b then 
+        write(a);
+
+    if b > a then
+        write(b);
+    else 
+        write(1);
 end.

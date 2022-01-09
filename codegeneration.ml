@@ -49,6 +49,12 @@ type local_env = (int * pascaltype) Smap.t
 type sbpAlloc = int * int * local_env * string * pascaltype
 type sbpDefs = sbpAlloc Smap.t
 
+let label_index = ref 0
+
+let new_label_index () =
+  label_index := !label_index + 1;
+  !label_index
+
 let popn n = addq (imm n) (reg rsp)
 let pushn n = subq (imm n) (reg rsp)
 
@@ -168,18 +174,15 @@ let subprogram_call sb_tr sb_name called_name comp_fun el =
   let lvl = get_level sb_tr called_name in
   let l = get_level sb_tr sb_name in
   Printf.printf "Got %d and %d" lvl l;
-  let ammount_to_pop =(8 + get_allocation_size sb_tr called_name) in
+  let ammount_to_pop = 8 + get_allocation_size sb_tr called_name in
 
   printf "\npopping %d\n" ammount_to_pop;
   (*TODO if lvl is > l, porque podem ser chamadas de dentro e fora*)
-  List.fold_left
-    (fun acc e -> acc ++ comp_fun e ++ pushq (reg rdi))
-    nop el ++
-    movq (reg rbp) (reg rsi) ++
-    frame_walk (lvl - l) (movq (ind ~ofs:16 rsi) (reg rsi)) ++
-    pushq (reg rsi) ++
-    call called_name
-
+  List.fold_left (fun acc e -> acc ++ comp_fun e ++ pushq (reg rdi)) nop el
+  ++ movq (reg rbp) (reg rsi)
+  ++ frame_walk (lvl - l) (movq (ind ~ofs:16 rsi) (reg rsi))
+  ++ pushq (reg rsi)
+  ++ call called_name
 
 (*Assume-se que todos os resultados das expressões são postos no RDI*)
 let rec compile_expr sb_tr sb_name e =
@@ -209,16 +212,70 @@ let rec compile_expr sb_tr sb_name e =
   | SUM (a, b) -> binop a b (addq (reg rsi) (reg rdi))
   | SUB (a, b) -> binop b a (subq (reg rsi) (reg rdi))
   | MUL (a, b) -> binop a b (imulq (reg rsi) (reg rdi))
-  (*TODO por completar*)
-  | DIV (a, b) -> binop a b (cqto ++ idivq (reg rbx))
-  | Equ (a, b) -> nop
-  | LE (a, b) -> nop
-  | LT (a, b) -> nop
-  | GE (a, b) -> nop
-  | GT (a, b) -> nop
-  | NOT a -> nop
-  | AND (a, b) -> nop
-  | OR (a, b) -> nop
+  (*
+    mov rdx, 0        ; clear dividend
+    mov rax, rsi   ; dividend
+    mov rcx, rdi    ; divisor
+    div ecx           ; EAX = 0x80, EDX = 0x3
+
+   *)
+  | DIV (a, b) ->
+      binop a b
+        (movq (imm 0) (reg rdx)
+        ++ movq (reg rsi) (reg rax)
+        ++ movq (reg rdi) (reg rcx)
+        ++ idivq (reg rcx)
+        ++ movq (reg rax) (reg rdi))
+  | Equ (a, b) ->
+      binop a b
+        (cmpq (reg rdi) (reg rsi) ++ sete (reg dil) ++ movzbq (reg dil) rdi)
+  | LE (a, b) ->
+      binop a b
+        (cmpq (reg rdi) (reg rsi) ++ setle (reg dil) ++ movzbq (reg dil) rdi)
+  | LT (a, b) ->
+      binop a b
+        (cmpq (reg rdi) (reg rsi) ++ setl (reg dil) ++ movzbq (reg dil) rdi)
+  | GE (a, b) ->
+      binop a b
+        (cmpq (reg rdi) (reg rsi) ++ setge (reg dil) ++ movzbq (reg dil) rdi)
+  | GT (a, b) ->
+      binop a b
+        (cmpq (reg rdi) (reg rsi) ++ setg (reg dil) ++ movzbq (reg dil) rdi)
+  | NOT a ->
+      compile_expr sb_tr sb_name a
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ setne (reg dil)
+      ++ movzbq (reg dil) rdi
+  | AND (a, b) ->
+      let i = new_label_index () in
+      let end_lbl = sprintf "AND_END_%d" i in
+      let false_result = end_lbl ^ "FALSE_RESULT" in
+
+      compile_expr sb_tr sb_name a
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ jne false_result
+      ++ compile_expr sb_tr sb_name b
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ je end_lbl ++ label false_result
+      ++ movq (imm 0) (reg rdi)
+      ++ label end_lbl
+  | OR (a, b) ->
+      let i = new_label_index () in
+      let end_lbl = sprintf "OR_END_%d" i in
+
+      compile_expr sb_tr sb_name a
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ je end_lbl
+      ++ compile_expr sb_tr sb_name b
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ je end_lbl
+      ++ movq (imm 0) (reg rdi)
+      ++ label end_lbl
   | CALL (name, exp_list) ->
       (*TODO add something to retrieve return value*)
       comment (sprintf "---CALLING %s ----" name)
@@ -247,8 +304,47 @@ let rec compile_stmt sb_tr sb_name = function
       List.fold_left
         (fun accum x -> accum ++ compile_stmt sb_tr sb_name x)
         nop stmt_list
-  | STMTFor (varname, fr, t, stmt) -> nop
-  | STMTIf (cond, then_part, else_part) -> nop
+  | STMTFor (varname, fr, t, stmt) ->
+      let fake_var = EntireVar varname in
+      let fake_initial_assign = STMTAss (fake_var, fr) in
+      let while_condition = LE (Var fake_var, t) in
+      let while_stmt =
+        STMTBlock [ stmt; STMTAss (fake_var, SUM (Var fake_var, Integer 1)) ]
+      in
+      let fake_stmt =
+        STMTBlock
+          [ fake_initial_assign; STMTWhile (while_condition, while_stmt) ]
+      in
+      compile_stmt sb_tr sb_name fake_stmt
+      (*
+            for a := 1 to 10 do 
+                STMT
+        
+        -----------------------
+        -   is the same as    -
+        -----------------------
+          
+            a := 1;
+            while a < 10 do
+                STMT
+                a:= a + 1;
+
+           *)
+  | STMTIf (cond, then_part, else_part) ->
+      let i = new_label_index () in
+      let compiled_then = compile_stmt sb_tr sb_name then_part in
+      let if_lbl = sprintf "IF_%d" i in
+      let if_end = if_lbl ^ "_END" in
+      let if_else = if_lbl ^ "_else" in
+      compile_expr sb_tr sb_name cond
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ (match else_part with
+         | None -> jne if_end ++ compiled_then
+         | Some a ->
+             jne if_else ++ compiled_then ++ jmp if_end ++ label if_else
+             ++ compile_stmt sb_tr sb_name a)
+      ++ label if_end
   (*Super Hyper Mega Important*)
   | STMTSubprogramCall (name, params_exps) ->
       comment (sprintf "---CALLING %s ----" name)
@@ -256,13 +352,39 @@ let rec compile_stmt sb_tr sb_name = function
            (compile_expr sb_tr sb_name)
            params_exps
       ++ comment (sprintf "###CALLING %s ####" name)
-  | STMTWhile (cond, stmt) -> nop
-  | STMTRead var -> nop
+  | STMTWhile (cond, stmt) ->
+      let i = new_label_index () in
+      let while_lbl = sprintf "while_%d" i in
+      let compiled_stmt = compile_stmt sb_tr sb_name stmt in
+      let while_start = while_lbl ^ "START" in
+      let while_end = while_lbl ^ "END" in
+      label while_start
+      ++ compile_expr sb_tr sb_name cond
+      ++ movq (imm 1) (reg rsi)
+      ++ cmpq (reg rdi) (reg rsi)
+      ++ jne while_end ++ compiled_stmt ++ jmp while_start ++ label while_end
+  | STMTRead var ->
+      let varname =
+        match var with
+        | EntireVar a -> a
+        | IndexedVar (a, b) -> Invalid_argument "NOT IMPLEMENTED" |> raise
+      in
+      if varname = sb_name then nop (*TODO this one should be the return*)
+      else
+        let l, (ofs, tp) = get_closest_declaration sb_tr sb_name varname in
+        let lvl = get_level sb_tr sb_name in
+        movq (reg rbp) (reg rsi)
+        ++ frame_walk (lvl - l) (movq (ind ~ofs:16 rsi) (reg rsi))
+
+        ++ pushq (reg rsi)
+        ++ call "scan_int" ++ popq rsi
+        ++ movq (reg rdi) (ind ~ofs rsi)
   (*Separado por virgulas, em que devemos ver qual o tipo de cada parametro e fazer print_int ou print dependendo disso*)
   | STMTWrite exp_list ->
-
+      (*Adicionar suporte para strings*)
       List.fold_left
-        (fun accum x -> comment "PRINT" ++  compile_expr sb_tr sb_name x ++ call "print_int")
+        (fun accum x ->
+          comment "PRINT" ++ compile_expr sb_tr sb_name x ++ call "print_int")
         nop exp_list
   | STMTEmpty -> nop
 
@@ -274,7 +396,7 @@ let rec compile_subprogram sbp_tree sbp =
   let pointer_setup = pushq (reg rsp) ++ movq (reg rsp) (reg rbp) in
   let allocate_variables = pushn allocation_size in
   let compiled_stmt = compile_stmt sbp_tree name stmt in
-  let end_subprogram = popn allocation_size ++ popq rbp ++  ret in
+  let end_subprogram = popn allocation_size ++ popq rbp ++ ret in
   let compiled_subprogram =
     label_func ++ pointer_setup ++ allocate_variables ++ compiled_stmt
     ++ end_subprogram
@@ -283,11 +405,31 @@ let rec compile_subprogram sbp_tree sbp =
     (fun accum x -> accum ++ compile_subprogram sbp_tree x)
     compiled_subprogram nested_sbps
 
+let helper_routines =
+  let h_print_int =
+    label "print_int"
+    ++ movq (reg rdi) (reg rsi)
+    ++ movq (ilab ".Sprint_int") (reg rdi)
+    ++ movq (imm 0) (reg rax)
+    ++ call "printf" ++ ret
+  in
+  let h_scan_int =
+    label "scan_int" ++ pushn 8
+    ++ xorl (reg eax) (reg eax)
+    ++ movq (ilab ".SScan_int") (reg rdi)
+    ++ movq (reg rsp) (reg rsi)
+    ++ call "scanf" ++ popq rdi ++ ret
+  in
+
+  nop ++ h_print_int ++ h_scan_int
+
+let helper_data =
+  label ".Sprint_int" ++ string "%d\n" ++ label ".SScan_int" ++ string "%d"
+
 let generation_pipeline program =
   let program_name, blk = match program with Program (a, b) -> (a, b) in
   let main_sbp = ProcedureDeclaration (program_name, [], blk) in
   let sbp_tree = get_subprogram_tree "" 0 main_sbp in
-  print_tree sbp_tree;
   let sbp_mc = compile_subprogram sbp_tree main_sbp in
   let p =
     {
@@ -296,13 +438,10 @@ let generation_pipeline program =
         ++ movq (reg rsp) (reg rbp)
         ++ call program_name
         ++ movq (imm 0) (reg rax)
-        ++ (* exit *)
-        ret ++ label "print_int"
-        ++ movq (reg rdi) (reg rsi)
-        ++ movq (ilab ".Sprint_int") (reg rdi)
-        ++ movq (imm 0) (reg rax)
-        ++ call "printf" ++ ret ++ sbp_mc;
-      data = label ".Sprint_int" ++ string "%d\n";
+        (* exit *)
+        ++ ret
+        ++ helper_routines ++ sbp_mc;
+      data = helper_data;
     }
   in
   p

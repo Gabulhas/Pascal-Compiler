@@ -17,5 +17,7 @@ begin
 
     write(numero + alface + 5);
 
+    write(alface / numero);
+
 
 end.

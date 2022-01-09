@@ -4,10 +4,10 @@ GENERATED=lexer.ml parser.ml parser.mli
 BIN=pascaml
 FLAGS=-dtypes
 
-all: $(BIN)
-	./$(BIN) ./tests/8_funcs.pas
-	gcc -no-pie -g test.s -o a.out
-	./a.out
+#all: $(BIN)
+#	./$(BIN) ./tests/8_funcs.pas
+#	gcc -no-pie -g test.s -o a.out
+#	./a.out
 
 
 $(BIN):$(CMO)

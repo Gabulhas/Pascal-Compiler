@@ -11,4 +11,5 @@ let pipeline debug filename =
        else formatter_of_out_channel (open_out "test.s"))
 
 let () =
+    
     pipeline false Sys.argv.(1)
