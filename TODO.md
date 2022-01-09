@@ -1,7 +1,24 @@
-user defined values
-arrays
-functions as expressions
-remover diferença entre booleanexp e arithexp
-error-handling
+Ass 
+Block 
+For 
+If 
+While 
+Read 
 
-code-generation
+B 
+PString 
+PChar 
+Var  - string e pchar
+SUM 
+SUB 
+MUL 
+DIV 
+Equ 
+LE 
+LT 
+GE 
+GT 
+NOT 
+AND 
+OR 
+CALL 

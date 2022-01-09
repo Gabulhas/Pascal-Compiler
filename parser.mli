@@ -26,6 +26,7 @@ type token =
   | OR
   | OF
   | NOT
+  | MODU
   | MINUS
   | LS
   | LP
@@ -43,6 +44,7 @@ type token =
   | EOF
   | END
   | ELSE
+  | DOWNTO
   | DOT
   | DO
   | DIVISION

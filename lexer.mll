@@ -33,7 +33,7 @@ rule lex =
 
       | "program"       { PROGRAM }
       | "var"           { VAR }
-      | "array"         { ARRAY }
+      | "Array"         { ARRAY }
       | "of"            { OF }
       | "int"           { TINT }
       | "boolean"       { TBOOLEAN }
@@ -49,6 +49,7 @@ rule lex =
       | "while"         { WHILE }
       | "for"           { FOR }
       | "to"            { TO }
+      | "downto"            { DOWNTO }
       | "do"            { DO}
       | "write"         { WRITE }
       | "read"         { READ }
@@ -60,6 +61,7 @@ rule lex =
       | "-"             { MINUS }
       | "*"             { TIMES }
       | "/"             { DIVISION }
+      | "%"             { MODU }
 
       | "="             { EQUAL }
       | "<="            { LESSEQUAL }

@@ -1,4 +1,12 @@
 ast.cmi :
+codegeneration.cmo : \
+    x86_64.cmi \
+    typechecker.cmo \
+    ast.cmi
+codegeneration.cmx : \
+    x86_64.cmx \
+    typechecker.cmx \
+    ast.cmi
 compile.cmo :
 compile.cmx :
 lexer.cmo : \
@@ -6,11 +14,17 @@ lexer.cmo : \
 lexer.cmx : \
     parser.cmx
 main.cmo : \
+    x86_64.cmi \
+    typechecker.cmo \
     parser.cmi \
-    lexer.cmo
+    lexer.cmo \
+    codegeneration.cmo
 main.cmx : \
+    x86_64.cmx \
+    typechecker.cmx \
     parser.cmx \
-    lexer.cmx
+    lexer.cmx \
+    codegeneration.cmx
 parser.cmo : \
     ast.cmi \
     parser.cmi
@@ -19,3 +33,12 @@ parser.cmx : \
     parser.cmi
 parser.cmi : \
     ast.cmi
+typechecker.cmo : \
+    ast.cmi
+typechecker.cmx : \
+    ast.cmi
+x86_64.cmo : \
+    x86_64.cmi
+x86_64.cmx : \
+    x86_64.cmi
+x86_64.cmi :

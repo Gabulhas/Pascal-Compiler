@@ -2,6 +2,8 @@
 
 open Ast;;
 
+
+
 let vars_to_list var_ides var_type =
     List.map (fun x -> VariableDeclaration(x, var_type)) var_ides
 
@@ -16,9 +18,9 @@ let vars_to_list var_ides var_type =
 %token            TRUE FALSE
 
 %token            PROGRAM VAR ARRAY OF TINT TBOOLEAN TCHAR TSTRING PROCEDURE FUNCTION BEGIN END
-%token            IF THEN ELSE WHILE DO FOR TO WRITE READ
+%token            IF THEN ELSE WHILE DO FOR TO WRITE READ DOWNTO
 
-%token            PLUS MINUS TIMES DIVISION EQUAL LESSEQUAL LESS AND OR NOT
+%token            PLUS MINUS TIMES DIVISION EQUAL LESSEQUAL LESS AND OR NOT MODU
 %token            ASSIGN
 
 %token            SEMICOLON COLON COMMA
@@ -30,14 +32,12 @@ let vars_to_list var_ides var_type =
 %token            DOT
 %token            EOF
 
-
-
 %left OR
 %left AND
 %nonassoc NOT
 %nonassoc LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOTEQUAL
 %left MINUS PLUS
-%left TIMES DIVISION
+%left TIMES DIVISION MODU
 %nonassoc LS
 %nonassoc THEN
 %nonassoc ELSE
@@ -71,11 +71,14 @@ END.
 (*-------------------Program part-----------------------------------------------------------*)
 (* program <identifier> ; <block> .*)
 program:
-     |PROGRAM PSTRING opt_variable_declaration_list opt_subprogram_list statement_part EOF { Program($2, $3, $4, $5) }
+     |PROGRAM PSTRING block EOF { Program($2, $3) }
      ;
 
-(*------------------------------------------------------------------------------------------*)
+block: 
+    | opt_variable_declaration_list opt_subprogram_list statement_part {Block($1, $2, $3)}
+    ;
 
+(*------------------------------------------------------------------------------------------*)
 (*-------------------Variable declaration part----------------------------------------------*)
 opt_variable_declaration_list: 
     |                                             { [] }
@@ -88,7 +91,7 @@ variable_declaration_list:
     ;
 
 variable_field:
-    separated_nonempty_list(COMMA, ide) COLON ptype SEMICOLON {vars_to_list $1 $3};
+    | separated_nonempty_list(COMMA, ide) COLON ptype SEMICOLON {vars_to_list $1 $3}
 (*------------------------------------------------------------------------------------------*)
 
 
@@ -101,9 +104,10 @@ statement:
     (*Mudar este ide para outra coisa, caso se use arrays*)
     | variable ASSIGN exp SEMICOLON                       { STMTAss($1,$3) }
     | BEGIN statement_list END SEMICOLON              { STMTBlock($2) }
-    | FOR ide ASSIGN exp TO exp DO statement    { STMTFor($2, $4, $6, $8) }
-    | IF LP exp RP THEN statement ELSE statement         { STMTIf($3,$6,Some $8) }
-    | IF LP exp RP THEN statement                        { STMTIf($3,$6,None) }
+    | FOR ide ASSIGN exp TO exp DO statement    { STMTFor($2, $4, $6, $8, true) }
+    | FOR ide ASSIGN exp DOWNTO exp DO statement    { STMTFor($2, $4, $6, $8, false) }
+    | IF exp THEN statement ELSE statement         { STMTIf($2,$4,Some $6) }
+    | IF exp THEN statement                        { STMTIf($2,$4,None) }
     | ide LP separated_list(COMMA, exp) RP SEMICOLON                    { STMTSubprogramCall($1,$3) }
     | WHILE exp DO statement                       { STMTWhile($2,$4) }
     | WRITE LP separated_list(COMMA, exp) RP SEMICOLON                  { STMTWrite($3) }
@@ -123,11 +127,14 @@ exp:
     | PSTRING {PString($1)}
     | TRUE {B(true)}
     | FALSE {B(false)}
-    | ide {Var($1)}
+    | ide {Var(EntireVar($1))}
+    | ide LS exp RS  {Var(IndexedVar($1,$3 ))}
     | exp PLUS exp {SUM($1,$3)}
     | exp MINUS exp {SUB($1,$3)}
+    | MINUS exp {SUB(Integer(0),$2)}
     | exp TIMES exp {MUL($1,$3)}
     | exp DIVISION exp {DIV($1,$3)}
+    | exp MODU exp {MOD($1,$3)}
     | exp EQUAL exp {Equ($1, $3)}
     | exp LESSEQUAL exp {LE($1, $3)}
     | exp LESS exp {LT($1, $3)}
@@ -153,10 +160,10 @@ subprogram_list
     ;
 
 subprogram
-    : PROCEDURE ide LP flatten(separated_list(COMMA, parameter)) RP SEMICOLON opt_variable_declaration_list statement_part 
-	                                          { ProcedureDeclaration($2,$4,$7, $8) }
-    | FUNCTION ide LP flatten(separated_list(COMMA, parameter)) RP COLON ptype SEMICOLON opt_variable_declaration_list statement_part
-	                                          { FunctionDeclaration($2,$4,$9,$10, $7) }
+    : PROCEDURE ide LP flatten(separated_list(COMMA, parameter)) RP SEMICOLON block 
+	                                          { ProcedureDeclaration($2,$4,$7) }
+    | FUNCTION ide LP flatten(separated_list(COMMA, parameter)) RP COLON ptype SEMICOLON block
+	                                          { FunctionDeclaration($2,$4,$9, $7) }
     ;
 
 parameter:
@@ -165,8 +172,8 @@ parameter:
 (*------------------------------------------------------------------------------------------*)
 (*-----------------------------OTHER STUFF :)-----------------------------------------------*)
 ptype: 
-    | stype {Simpletype($1)}
-
+    | stype {SimpleType($1)}
+    | ARRAY LS INT DOT DOT INT RS OF stype {ArrayType($3, $6, $9)}
 
 stype:
     | TINT {TypeInteger}
@@ -179,7 +186,7 @@ variable:
     | ide {EntireVar($1)}
 
 ide:
-    | IDE {Ident($1)}
+    | IDE {$1}
 ;
 (*------------------------------------------------------------------------------------------*)
 

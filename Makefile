@@ -1,18 +1,14 @@
 #CMO=lexer.cmo parser.cmo x86_64.cmo compile.cmo main.cmo
-CMO=lexer.cmo parser.cmo main.cmo
+CMO=lexer.cmo parser.cmo typechecker.cmo x86_64.ml codegeneration.cmo main.cmo 
 GENERATED=lexer.ml parser.ml parser.mli
 BIN=pascaml
 FLAGS=-dtypes
 
 #all: $(BIN)
-#	./$(BIN) test.exp
-#	gcc -g test.s -o a.out
+#	./$(BIN) ./tests/8_funcs.pas
+#	gcc -no-pie -g test.s -o a.out
 #	./a.out
 
-#all: $(BIN)
-#	./$(BIN) test.exp
-#	gcc -g test.s -o a.out
-#	./a.out
 
 $(BIN):$(CMO)
 	ocamlc $(FLAGS) -o $(BIN) $(CMO)
