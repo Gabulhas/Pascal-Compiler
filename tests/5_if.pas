@@ -1,4 +1,4 @@
-program "statement"
+program "if_and_boolean_expressions"
 
 var
     a  :int; 
@@ -11,7 +11,6 @@ begin
     c:= false | (false & (a < b));
     if a > b then 
         write(a);
-
     if b > a then
         write(b);
     else 

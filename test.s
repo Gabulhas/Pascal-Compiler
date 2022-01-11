@@ -2,7 +2,7 @@
 	.globl	main
 main:
 	movq %rsp, %rbp
-	call for_test
+	call read_val
 	movq $0, %rax
 	ret
 print_int:
@@ -19,7 +19,7 @@ scan_int:
 	call scanf
 	popq %rdi
 	ret
-for_test:
+read_val:
 	pushq %rsp
 	movq %rsp, %rbp
 	subq $16, %rsp
@@ -27,101 +27,45 @@ for_test:
 	pushq %rsi
 	call scan_int
 	popq %rsi
+	movq %rdi, -8(%rsi)
+#PRINT
+	movq %rbp, %rsi
+	movq -8(%rsi), %rdi
+	call print_int
+	movq %rbp, %rsi
+	movq -8(%rsi), %rdi
+	pushq %rdi
+	movq $10, %rdi
+	popq %rsi
+	cmpq %rdi, %rsi
+	setg %dil
+	movzbq %dil, %rdi
+	movq $1, %rsi
+	cmpq %rdi, %rsi
+	jne IF_1_else
+	movq $1, %rdi
+	movq %rbp, %rsi
 	movq %rdi, -16(%rsi)
-#PRINT
+	jmp IF_1_END
+IF_1_else:
+	movq $0, %rdi
+	movq %rbp, %rsi
+	movq %rdi, -16(%rsi)
+IF_1_END:
 	movq %rbp, %rsi
 	movq -16(%rsi), %rdi
-	call print_int
-	movq $10, %rdi
-	movq %rbp, %rsi
-	movq %rdi, -8(%rsi)
-while_1START:
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	pushq %rdi
-	movq %rbp, %rsi
-	movq -16(%rsi), %rdi
-	popq %rsi
-	cmpq %rdi, %rsi
-	setle %dil
-	movzbq %dil, %rdi
 	movq $1, %rsi
 	cmpq %rdi, %rsi
-	jne while_1END
+	jne IF_2_else
 #PRINT
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	call print_int
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	pushq %rdi
 	movq $1, %rdi
-	popq %rsi
-	addq %rsi, %rdi
-	movq %rbp, %rsi
-	movq %rdi, -8(%rsi)
-	jmp while_1START
-while_1END:
-	movq %rbp, %rsi
-	movq -16(%rsi), %rdi
-	movq %rbp, %rsi
-	movq %rdi, -8(%rsi)
-while_2START:
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	pushq %rdi
-	movq $10, %rdi
-	popq %rsi
-	cmpq %rdi, %rsi
-	setge %dil
-	movzbq %dil, %rdi
-	movq $1, %rsi
-	cmpq %rdi, %rsi
-	jne while_2END
+	call print_int
+	jmp IF_2_END
+IF_2_else:
 #PRINT
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
+	movq $0, %rdi
 	call print_int
-	movq $1, %rdi
-	pushq %rdi
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	popq %rsi
-	subq %rsi, %rdi
-	movq %rbp, %rsi
-	movq %rdi, -8(%rsi)
-	jmp while_2START
-while_2END:
-	movq $10, %rdi
-	movq %rbp, %rsi
-	movq %rdi, -8(%rsi)
-while_3START:
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	pushq %rdi
-	movq %rbp, %rsi
-	movq -16(%rsi), %rdi
-	popq %rsi
-	cmpq %rdi, %rsi
-	setle %dil
-	movzbq %dil, %rdi
-	movq $1, %rsi
-	cmpq %rdi, %rsi
-	jne while_3END
-#PRINT
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	call print_int
-	movq %rbp, %rsi
-	movq -8(%rsi), %rdi
-	pushq %rdi
-	movq $1, %rdi
-	popq %rsi
-	addq %rsi, %rdi
-	movq %rbp, %rsi
-	movq %rdi, -8(%rsi)
-	jmp while_3START
-while_3END:
+IF_2_END:
 	addq $16, %rsp
 	popq %rbp
 	ret

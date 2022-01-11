@@ -1,4 +1,4 @@
 program "program_only"
 begin
-    x:=4;
+    write(1);
 end.

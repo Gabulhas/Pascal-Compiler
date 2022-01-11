@@ -1,17 +1,19 @@
-program "statement"
+program "read_val"
 
 var
-    numero  :int; 
-    treta   :int; 
-    ola     :boolean; 
-    primeiro, segundo, terceiro:int;
+    a :int;
+    b :boolean;
 
 begin
-    numero:=4;
-    treta:=5;
-    if(numero > treta) then 
-        numero:=1;
+    read(a);
+    write(a);
+    if a > 10 then
+        b := true;
     else
-        numero:=0;
-    end;
+        b := false;
+    
+    if b then
+        write(1);
+    else
+        write(0);
 end.

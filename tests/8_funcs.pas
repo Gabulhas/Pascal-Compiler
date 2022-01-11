@@ -9,7 +9,6 @@ end.
 
 begin 
     f := 5;
-
     square(3); 
     write(f);
 end.
